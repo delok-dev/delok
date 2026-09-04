@@ -1,0 +1,252 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   1. SEMANTIC VARIABLES (Runtime values for Light/Dark Mode)
+   ========================================================================== */
+:root {
+  /* Dark Mode First (Default) - Zinc Palette */
+  --background: #09090b;
+  --surface: #121215;
+  --surface-hover: #1c1c21;
+  --foreground: #fafafa;
+  --muted-foreground: #a1a1aa;
+  --border: #27272a;
+
+  /* Brand Primary (Indigo) */
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+
+  /* Status Colors (Color Carries Meaning) */
+  --success: #22c55e; /* OK / Healthy */
+  --warning: #f59e0b; /* WARN log */
+  --danger: #ef4444; /* ERROR / Fatal */
+  --info: #06b6d4; /* INFO log */
+
+  /* Radius System (8pt Grid based) */
+  --radius: 0.5rem; /* 8px default */
+}
+
+/* Optional Light Mode Override */
+.light {
+  --background: #ffffff;
+  --surface: #f4f4f5;
+  --surface-hover: #e4e4e7;
+  --foreground: #09090b;
+  --muted-foreground: #71717a;
+  --border: #e4e4e7;
+}
+
+/* ==========================================================================
+   2. TAILWIND V4 THEME BRIDGE
+   ========================================================================== */
+@theme inline {
+  /* Colors */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  /* Fonts */
+  --font-sans: var(--font-space-grotesk), "Inter", sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+
+  /* Radii mapping */
+  --radius-sm: calc(var(--radius) - 2px); /* 6px */
+  --radius-md: var(--radius); /* 8px */
+  --radius-lg: calc(var(--radius) + 4px); /* 12px */
+}
+
+/* ==========================================================================
+   3. SCROLLBAR (Thin, Rounded, Theme-Aware)
+   ========================================================================== */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* WebKit / Chromium / Edge */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ==========================================================================
+   4. TOAST PROGRESS BAR (Auto-dismiss countdown)
+   ========================================================================== */
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ==========================================================================
+   5. LOADER (Shared three-bar activity indicator)
+   ========================================================================== */
+@keyframes delok-loader-bar {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scaleY(1);
+  }
+  20% {
+    opacity: 1;
+    transform: scaleY(1.5);
+  }
+  40% {
+    opacity: 0.5;
+    transform: scaleY(1);
+  }
+}
+
+.animate-delok-loader-bar {
+  animation: delok-loader-bar 1s linear infinite;
+  transform-origin: center;
+}
+
+.animate-delok-loader-bar:nth-child(2) {
+  animation-delay: 250ms;
+}
+
+.animate-delok-loader-bar:nth-child(3) {
+  animation-delay: 500ms;
+}
+
+/* ==========================================================================
+   6. LOG PREVIEW INGESTION (DelokLogPreview live stream)
+   ========================================================================== */
+:root {
+  /* py-1.5 (12px) + single line of text -> stable row height */
+  --delok-log-row-h: 1.8125rem; /* 29px */
+}
+
+@keyframes log-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-log-enter {
+  animation: log-enter 300ms ease-out;
+}
+
+/* ==========================================================================
+   7. LOG INVESTIGATION DEMO LOOP (landing page only)
+   ========================================================================== */
+@keyframes detail-crossfade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-detail-crossfade {
+  animation: detail-crossfade 250ms ease-out;
+}
+
+@keyframes cursor-click-pulse {
+  from {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0.7;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+}
+
+.animate-click-pulse {
+  animation: cursor-click-pulse 500ms ease-out forwards;
+}
+
+/* ==========================================================================
+   8. ENTRANCE ANIMATIONS (Once-only page reveal)
+   ========================================================================== */
+@keyframes hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 12px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-heading {
+  animation: hero-reveal 600ms ease-out both;
+}
+
+.animate-hero-cta {
+  --reveal-y: 8px;
+  animation: hero-reveal 500ms ease-out 150ms both;
+}
+
+.animate-hero-log {
+  --reveal-y: 16px;
+  animation: hero-reveal 700ms ease-out 300ms both;
+}
+
+@keyframes section-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 18px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-section-heading {
+  animation: section-reveal 600ms ease-out both;
+}
+
+.animate-section-visual {
+  --reveal-y: 18px;
+  animation: section-reveal 700ms ease-out 80ms both;
+}
+
+.animate-section-copy {
+  --reveal-y: 12px;
+  animation: section-reveal 600ms ease-out 160ms both;
+}
