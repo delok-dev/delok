@@ -1,0 +1,34 @@
+// /prisma/schema/organization.prisma
+model Organization {
+  id        String   @id @default(cuid())
+
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  projects            Project[]
+  organizationMembers OrganizationMember[]
+
+  @@map("organization")
+}
+model OrganizationMember {
+  organizationId String
+  userId         String
+
+  role OrganizationRole
+
+  joinedAt DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([organizationId, userId])
+  @@map("organization_member")
+}
+
+enum OrganizationRole {
+  OWNER
+  MEMBER
+}

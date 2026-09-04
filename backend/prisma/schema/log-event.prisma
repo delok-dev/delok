@@ -1,0 +1,23 @@
+model LogEvent {
+  id String @id @default(cuid())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  environment String
+  level       String
+  event       String
+
+  message String?
+
+  occurredAt DateTime
+  receivedAt DateTime @default(now())
+
+  payload Json?
+
+  @@index([projectId])
+  @@index([occurredAt])
+  @@index([projectId, occurredAt])
+  @@index([projectId, level])
+  @@map("log_event")
+}
