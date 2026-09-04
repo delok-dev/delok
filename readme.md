@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>See what your applications are doing.</strong>
+  <strong>See what your systems are doing.</strong>
 </p>
 
 <p align="center">
