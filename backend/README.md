@@ -1,6 +1,6 @@
 # Delok Backend
 
-**Delok** is a log monitoring platform for collecting, storing, searching, and streaming structured application logs. This repository is the **backend service** — it owns authentication, organization/project management, API-key-scoped log ingestion, PostgreSQL persistence, and authenticated WebSocket realtime delivery to the Delok dashboard.
+**Delok** is a log monitoring platform for collecting, storing, searching, and streaming structured application logs. This repository is the **backend service**. This repo owns authentication, organization/project management, API-key-scoped log ingestion, PostgreSQL persistence, and authenticated WebSocket realtime delivery to the Delok dashboard.
 
 ## Overview
 
@@ -25,15 +25,15 @@ See [Architecture Overview](docs/architecture/overview.md), [Request Flow](docs/
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Runtime | Node.js >=22, TypeScript 6 (ESM, `tsx watch`), Express 5 |
-| Database | PostgreSQL, Prisma 7 (`@prisma/adapter-pg`), `prisma.config.ts` multi-schema (`prisma/schema/*.prisma`) |
-| Auth | `better-auth` 1.6.23 (Prisma adapter, email/password + Google/GitHub OAuth, Resend email) |
-| Realtime | `ws` 8 (authenticated upgrade, `Set<string>` subscriptions, 30s ping/pong) |
-| Validation | `zod` 4 |
-| Hardening | `helmet`, `cors` (origin `FRONTEND_URL`), `express-rate-limit` (auth per-path + ingestion 120/min) |
-| Testing | `vitest`, `supertest` |
+| Layer      | Technology                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------- |
+| Runtime    | Node.js >=22, TypeScript 6 (ESM, `tsx watch`), Express 5                                                |
+| Database   | PostgreSQL, Prisma 7 (`@prisma/adapter-pg`), `prisma.config.ts` multi-schema (`prisma/schema/*.prisma`) |
+| Auth       | `better-auth` 1.6.23 (Prisma adapter, email/password + Google/GitHub OAuth, Resend email)               |
+| Realtime   | `ws` 8 (authenticated upgrade, `Set<string>` subscriptions, 30s ping/pong)                              |
+| Validation | `zod` 4                                                                                                 |
+| Hardening  | `helmet`, `cors` (origin `FRONTEND_URL`), `express-rate-limit` (auth per-path + ingestion 120/min)      |
+| Testing    | `vitest`, `supertest`                                                                                   |
 
 ## Repository Structure
 
@@ -98,47 +98,47 @@ See [Setup Guide](docs/guides/setup.md).
 
 Verified from `package.json` `scripts`:
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | `tsx watch src/server.ts` — dev with auto-restart |
-| `npm run type-check` | `tsc --noEmit` (strict) |
-| `npm run build` | `prisma generate && tsc` → `dist/` (used by Dockerfile) |
-| `npm start` | `node dist/server.js` |
-| `npm test` | `vitest run` |
-| `npm run db:generate` | `prisma generate` (client to `src/generated/prisma`) |
-| `npm run db:migrate:dev` | `prisma migrate dev` (dev, uses `prisma.config.ts`) |
-| `npm run db:migrate` | `prisma migrate deploy` (production/CI, non-interactive) |
+| Command                  | Description                                              |
+| ------------------------ | -------------------------------------------------------- |
+| `npm run dev`            | `tsx watch src/server.ts` — dev with auto-restart        |
+| `npm run type-check`     | `tsc --noEmit` (strict)                                  |
+| `npm run build`          | `prisma generate && tsc` → `dist/` (used by Dockerfile)  |
+| `npm start`              | `node dist/server.js`                                    |
+| `npm test`               | `vitest run`                                             |
+| `npm run db:generate`    | `prisma generate` (client to `src/generated/prisma`)     |
+| `npm run db:migrate:dev` | `prisma migrate dev` (dev, uses `prisma.config.ts`)      |
+| `npm run db:migrate`     | `prisma migrate deploy` (production/CI, non-interactive) |
 
 ## Configuration
 
 Loaded via `dotenv/config` in `server.ts` and validated fail-fast in [`src/lib/env.ts`](src/lib/env.ts) (Zod). Never commit real secrets; use `.env.example` as template.
 
-| Variable | Required | Purpose |
-|----------|----------|---------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `BETTER_AUTH_SECRET` | Yes | Session signing secret |
-| `BETTER_AUTH_URL` | Yes | Public backend URL (e.g. `http://localhost:8000`) |
-| `FRONTEND_URL` | Yes | Frontend origin for CORS `origin`, `trustedOrigins`, `errorURL` |
-| `RESEND_API_KEY` | Yes | Resend API key |
-| `EMAIL_FROM` | Yes | Verified sender address |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Yes | Google OAuth |
-| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Yes | GitHub OAuth |
-| `PORT` | No | Default `8000` |
-| `NODE_ENV` | No | `development` / `production` / `test` (default `development`) |
+| Variable                                    | Required | Purpose                                                         |
+| ------------------------------------------- | -------- | --------------------------------------------------------------- |
+| `DATABASE_URL`                              | Yes      | PostgreSQL connection string                                    |
+| `BETTER_AUTH_SECRET`                        | Yes      | Session signing secret                                          |
+| `BETTER_AUTH_URL`                           | Yes      | Public backend URL (e.g. `http://localhost:8000`)               |
+| `FRONTEND_URL`                              | Yes      | Frontend origin for CORS `origin`, `trustedOrigins`, `errorURL` |
+| `RESEND_API_KEY`                            | Yes      | Resend API key                                                  |
+| `EMAIL_FROM`                                | Yes      | Verified sender address                                         |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Yes      | Google OAuth                                                    |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Yes      | GitHub OAuth                                                    |
+| `PORT`                                      | No       | Default `8000`                                                  |
+| `NODE_ENV`                                  | No       | `development` / `production` / `test` (default `development`)   |
 
 ## API
 
-| Area | Base path | Auth | Docs |
-|------|-----------|------|------|
-| Ingestion (SDK) | `POST /api/ingestion` | `x-api-key` (rate-limited 120/min per key) | [Ingestion API](docs/api/ingestion.md) |
-| Organizations | `/api/organization` (CRUD by slug) | Session | [Organization API](docs/api/organization.md) |
-| Projects | `/api/organizations/:organizationSlug/projects` | Session (member read, owner write) | [Project API](docs/api/project.md) |
-| API Keys | `/api/projects/:projectId/api-keys` + `/api/api-key/:id` | Session (owner only; raw key returned once) | [API Key API](docs/api/api-key.md) |
-| Logs | `GET /api/projects/:projectId/logs` (paginated, filterable) | Session (member) | [Log Event API](docs/api/log-event.md) |
-| User | `GET /api/user/me` | Session | [User API](docs/api/user.md) |
-| Auth | `/api/auth/*` (Better Auth + `POST /api/auth/resend-verification`) | Mixed / rate-limited per-path | [Authentication](docs/backend/authentication.md) |
-| Ops | `GET /health`, `GET /readiness`, `GET /` | Public | `src/app.ts` |
-| Realtime | WS upgrade (session required) + `project.subscribe` | Session + `ensureProjectMember` | [Realtime](docs/backend/realtime.md) |
+| Area            | Base path                                                          | Auth                                        | Docs                                             |
+| --------------- | ------------------------------------------------------------------ | ------------------------------------------- | ------------------------------------------------ |
+| Ingestion (SDK) | `POST /api/ingestion`                                              | `x-api-key` (rate-limited 120/min per key)  | [Ingestion API](docs/api/ingestion.md)           |
+| Organizations   | `/api/organization` (CRUD by slug)                                 | Session                                     | [Organization API](docs/api/organization.md)     |
+| Projects        | `/api/organizations/:organizationSlug/projects`                    | Session (member read, owner write)          | [Project API](docs/api/project.md)               |
+| API Keys        | `/api/projects/:projectId/api-keys` + `/api/api-key/:id`           | Session (owner only; raw key returned once) | [API Key API](docs/api/api-key.md)               |
+| Logs            | `GET /api/projects/:projectId/logs` (paginated, filterable)        | Session (member)                            | [Log Event API](docs/api/log-event.md)           |
+| User            | `GET /api/user/me`                                                 | Session                                     | [User API](docs/api/user.md)                     |
+| Auth            | `/api/auth/*` (Better Auth + `POST /api/auth/resend-verification`) | Mixed / rate-limited per-path               | [Authentication](docs/backend/authentication.md) |
+| Ops             | `GET /health`, `GET /readiness`, `GET /`                           | Public                                      | `src/app.ts`                                     |
+| Realtime        | WS upgrade (session required) + `project.subscribe`                | Session + `ensureProjectMember`             | [Realtime](docs/backend/realtime.md)             |
 
 Validation via Zod (`validate` middleware for bodies); error shape `{ success:false, error:{code,message}, timestamp }` (see [Error Handling](docs/backend/error-handling.md), [Validation](docs/backend/validation.md)).
 
@@ -167,14 +167,14 @@ Framework: `vitest` (`npm test` → `vitest run`) with `supertest` and `@types/s
 
 ## Documentation
 
-| Topic | Link |
-|-------|------|
-| Architecture | [Overview](docs/architecture/overview.md) · [Folder Structure](docs/architecture/folder-structure.md) · [Request Flow](docs/architecture/request-flow.md) · [Dependency Rules](docs/architecture/dependency-rules.md) |
-| API | [Ingestion](docs/api/ingestion.md) · [Log Event](docs/api/log-event.md) · [Organization](docs/api/organization.md) · [Project](docs/api/project.md) · [API Key](docs/api/api-key.md) · [User](docs/api/user.md) |
-| Backend | [Authentication](docs/backend/authentication.md) · [Authorization](docs/backend/authorization.md) · [Realtime](docs/backend/realtime.md) · [Validation](docs/backend/validation.md) · [Error Handling](docs/backend/error-handling.md) |
-| Database | [Schema](docs/database/schema.md) · [Relationships](docs/database/relationships.md) · [Migrations](docs/database/migrations.md) |
-| Guides | [Setup](docs/guides/setup.md) · [Create Module](docs/guides/create-module.md) · [Create Route](docs/guides/create-route.md) · [Coding Style](docs/guides/coding-style.md) |
-| Decisions | [ADRs](docs/decisions/001-project-architecture.md) |
+| Topic        | Link                                                                                                                                                                                                                                   |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture | [Overview](docs/architecture/overview.md) · [Folder Structure](docs/architecture/folder-structure.md) · [Request Flow](docs/architecture/request-flow.md) · [Dependency Rules](docs/architecture/dependency-rules.md)                  |
+| API          | [Ingestion](docs/api/ingestion.md) · [Log Event](docs/api/log-event.md) · [Organization](docs/api/organization.md) · [Project](docs/api/project.md) · [API Key](docs/api/api-key.md) · [User](docs/api/user.md)                        |
+| Backend      | [Authentication](docs/backend/authentication.md) · [Authorization](docs/backend/authorization.md) · [Realtime](docs/backend/realtime.md) · [Validation](docs/backend/validation.md) · [Error Handling](docs/backend/error-handling.md) |
+| Database     | [Schema](docs/database/schema.md) · [Relationships](docs/database/relationships.md) · [Migrations](docs/database/migrations.md)                                                                                                        |
+| Guides       | [Setup](docs/guides/setup.md) · [Create Module](docs/guides/create-module.md) · [Create Route](docs/guides/create-route.md) · [Coding Style](docs/guides/coding-style.md)                                                              |
+| Decisions    | [ADRs](docs/decisions/001-project-architecture.md)                                                                                                                                                                                     |
 
 ## License
 
