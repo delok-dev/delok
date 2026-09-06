@@ -36,7 +36,7 @@ export default function QuickstartPage() {
           <span className="font-mono text-foreground"> &gt;=18</span>. No
           runtime dependencies.
         </p>
-        <CodeBlock language="bash" code={`npm install delok`} />
+        <CodeBlock language="bash" code={`npm install @delok/sdk`} />
       </section>
 
       <section id="account" className="scroll-mt-20 space-y-4">
@@ -126,7 +126,7 @@ export default function QuickstartPage() {
         </p>
         <CodeBlock
           language="typescript"
-          code={`import { Delok } from "delok";
+          code={`import { Delok } from "@delok/sdk";
 
 const delok = new Delok({
   apiKey: process.env.DELOK_API_KEY!,

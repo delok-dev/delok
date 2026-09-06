@@ -16,7 +16,7 @@ import {
 import { ASSETS } from "@/src/constants/assets";
 import { EXTERNAL_LINKS } from "@/src/constants/external-links";
 
-const INSTALL_COMMAND = "npm install delok";
+const INSTALL_COMMAND = "npm install @delok/sdk";
 
 const BENEFITS = [
   {
