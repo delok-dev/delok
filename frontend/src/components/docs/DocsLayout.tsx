@@ -53,7 +53,7 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
               <p className="inline-flex flex-wrap items-center gap-1.5 text-sm leading-relaxed text-muted-foreground">
                 <span>Found Something?</span>
                 <a
-                  href={EXTERNAL_LINKS.GITHUB}
+                  href={EXTERNAL_LINKS.DISCUSSION}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 font-medium text-foreground underline decoration-border underline-offset-4 hover:text-primary hover:decoration-primary"
