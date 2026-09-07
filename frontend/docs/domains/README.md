@@ -4,7 +4,7 @@ All domains live under `src/domains/`. Each domain is traced below — no assump
 
 | Domain | Purpose | Structure | Routes using it |
 |--------|---------|-----------|-----------------|
-| [auth](auth.md) | Email/password + OAuth + email verification + password reset | `components/`, `hooks/`, `schemas/`, `types/`, `api/` | `/sign-in`, `/sign-up`, `/sign-up/verify-email`, `/sign-up/verified`, `/sign-in/forgot-password`, `/sign-in/reset-password`, `/auth/error` |
+| [auth](auth.md) | OAuth authentication (Google, GitHub) | `components/`, `api/` | `/sign-in`, `/auth/error` |
 | [organization](organization.md) | CRUD for organizations (slug-identified) | `components/`, `hooks/`, `schemas/`, `types/`, `api/` | `/orgs`, `/orgs/:slug`, `/orgs/:slug/settings`, `/orgs/:slug/projects` |
 | [project](project.md) | CRUD for projects scoped to org | `components/`, `hooks/`, `api/`, `types/`, `schemas/` + realtime | `/orgs/:slug/projects`, `/orgs/:slug/projects/:projectId`, `.../settings` |
 | [log](log.md) | Log types, service, formatting, row/detail components | `types/`, `api/`, `utils/`, `components/` | Used via `log-explorer` on `/orgs/:slug/projects/:projectId` |

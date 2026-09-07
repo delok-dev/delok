@@ -21,7 +21,7 @@ delok-backend/
 prisma/
 ├── schema/              # Multi-file Prisma schema (Prisma 7 multi-schema)
 │   ├── schema.prisma    # Root generator + datasource declaration
-│   ├── auth.prisma      # User, Session, Account, Verification models
+│   ├── auth.prisma      # User, Session, Account models
 │   ├── organization.prisma  # Organization, OrganizationMember models
 │   ├── project.prisma   # Project, ApiKey models
 │   └── log-event.prisma # LogEvent model
@@ -57,8 +57,7 @@ Every file exports a single pre-configured singleton instance. Modules import th
 | File | Export | Purpose |
 |------|--------|---------|
 | [prisma.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/prisma.ts) | `prisma` | `PrismaClient` configured with `@prisma/adapter-pg` (PostgreSQL driver) |
-| [auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts) | `auth` | `betterAuth` instance with Prisma adapter, OAuth providers (Google, GitHub), email/password, email verification, password reset, custom password schema hook |
-| [resend.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/resend.ts) | `resend` | `Resend` SDK client for transactional emails |
+| [auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts) | `auth` | `betterAuth` instance with Prisma adapter, OAuth providers (Google, GitHub) |
 | [delok.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/delok.ts) | `delok`, `errorLogger` | Delok SDK for self-monitoring + error logger middleware function |
 
 **Design rationale**: Centralizing client construction ensures consistent configuration (timeouts, retries, auth headers) across the app. It also makes swapping implementations easy (change one file).
@@ -84,7 +83,7 @@ Middleware is mounted per-route in the `*.route.ts` files (not globally) unless 
 
 ```
 modules/
-├── auth/                # Verification email resend endpoint
+├── auth/                # (removed — auth handled by Better Auth)
 ├── user/                # Session (me) only — returns req.session
 ├── organization/        # Organization CRUD + ownership rules
 ├── project/             # Project CRUD (nested under organization)
@@ -129,13 +128,7 @@ The realtime subsystem is separated from `modules/` because it's a cross-cutting
 
 ### `src/features/` — Shared Feature Config
 
-```
-features/
-└── auth/
-    └── auth.schema.ts    # passwordSchema: shared password complexity rules
-```
-
-Used by `lib/auth.ts` to validate sign-up passwords. Placed here because the schema is consumed by the auth hook but doesn't belong to a specific module.
+The `features/auth/` directory has been removed along with email/password authentication.
 
 ### `src/types/` — TypeScript Augmentations
 

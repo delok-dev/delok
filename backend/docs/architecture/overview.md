@@ -37,13 +37,12 @@ graph TD
         K[Prisma ORM]
         L[WebSocket Realtime]
         M[Better Auth]
-        N[Resend Email]
         O[Delok SDK Self-Monitoring]
     end
 
     subgraph "External Services"
         P[(PostgreSQL)]
-        Q[Email Provider]
+
     end
 
     A --> C
@@ -61,7 +60,6 @@ graph TD
     K --> P
     H --> L
     H --> M
-    H --> N
     H --> O
     F --> E
     G --> E
@@ -119,8 +117,7 @@ Pattern example: [organization.repository.ts](file:///c:/Users/Yuan/OneDrive/Des
 | Component | Purpose |
 |-----------|---------|
 | Prisma Client ([prisma.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/prisma.ts)) | Database adapter (PostgreSQL via `@prisma/adapter-pg`) |
-| Better Auth ([auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts)) | Authentication, session management, OAuth, email flows |
-| Resend ([resend.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/resend.ts)) | Email delivery (verification, password reset) |
+| Better Auth ([auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts)) | Authentication, session management, OAuth |
 | Realtime Service ([realtime.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/infrastructure/realtime/realtime.service.ts)) | WebSocket event broadcasting |
 | Delok SDK ([delok.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/delok.ts)) | Self-monitoring (the backend uses its own product for logging) |
 

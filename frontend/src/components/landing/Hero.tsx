@@ -42,8 +42,8 @@ export function Hero() {
                 className="absolute -inset-x-10 -inset-y-6 bg-background/70 blur-2xl rounded-full pointer-events-none"
               />
               <div className="relative flex flex-wrap items-center gap-3">
-                <Button href={ROUTES.AUTH.SIGN_UP} size="lg">
-                  Get started
+                <Button href={ROUTES.AUTH.SIGN_IN} size="lg">
+                  Sign in
                 </Button>
                 <Button
                   href={EXTERNAL_LINKS.DOCS}

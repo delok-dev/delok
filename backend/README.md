@@ -6,7 +6,7 @@
 
 The backend exposes two authentication surfaces:
 
-- **Session auth (Better Auth)** for human users — email/password (with verification), Google OAuth, GitHub OAuth. Used by all management APIs (organizations, projects, API keys, log queries).
+- **Session auth (Better Auth)** for human users — Google OAuth, GitHub OAuth. Used by all management APIs (organizations, projects, API keys, log queries).
 - **API-key auth (`x-api-key: dlok_…`)** for machine ingestion — used only by `POST /api/ingestion`. Keys are `dlok_` + 32 random bytes (SHA-256 hashed at rest, `keyHash @unique`), revocable via `revokedAt`, with throttled `lastUsedAt`.
 
 Ingested logs are normalized, stored in PostgreSQL, and broadcast over WebSocket (`log.created` + `project.log_count.updated`) to clients subscribed to that `projectId`.
@@ -29,7 +29,7 @@ See [Architecture Overview](docs/architecture/overview.md), [Request Flow](docs/
 | ---------- | ------------------------------------------------------------------------------------------------------- |
 | Runtime    | Node.js >=22, TypeScript 6 (ESM, `tsx watch`), Express 5                                                |
 | Database   | PostgreSQL, Prisma 7 (`@prisma/adapter-pg`), `prisma.config.ts` multi-schema (`prisma/schema/*.prisma`) |
-| Auth       | `better-auth` 1.6.23 (Prisma adapter, email/password + Google/GitHub OAuth, Resend email)               |
+| Auth       | `better-auth` 1.6.23 (Prisma adapter, Google/GitHub OAuth)                                             |
 | Realtime   | `ws` 8 (authenticated upgrade, `Set<string>` subscriptions, 30s ping/pong)                              |
 | Validation | `zod` 4                                                                                                 |
 | Hardening  | `helmet`, `cors` (origin `FRONTEND_URL`), `express-rate-limit` (auth per-path + ingestion 120/min)      |
@@ -44,11 +44,10 @@ delok-backend/
 │   └── migrations/      # timestamped SQL migrations
 ├── src/
 │   ├── app.ts / server.ts
-│   ├── lib/             # env, prisma, auth, resend singletons
+│   ├── lib/             # env, prisma, auth singletons
 │   ├── middlewares/     # auth, validate, error, rate-limit/*
-│   ├── modules/         # organization, project, api-key, ingestion, log-event, auth, user
+│   ├── modules/         # organization, project, api-key, ingestion, log-event, user
 │   ├── infrastructure/realtime/  # websocket, realtime.service, event.types
-│   ├── features/auth/   # passwordSchema
 │   ├── utils/           # AppError, async-handler, api-response, hash, generate-slug
 │   ├── types/           # express.d.ts (req.session)
 │   └── generated/prisma/ # generated client (output from schema.prisma)
@@ -119,8 +118,7 @@ Loaded via `dotenv/config` in `server.ts` and validated fail-fast in [`src/lib/e
 | `BETTER_AUTH_SECRET`                        | Yes      | Session signing secret                                          |
 | `BETTER_AUTH_URL`                           | Yes      | Public backend URL (e.g. `http://localhost:8000`)               |
 | `FRONTEND_URL`                              | Yes      | Frontend origin for CORS `origin`, `trustedOrigins`, `errorURL` |
-| `RESEND_API_KEY`                            | Yes      | Resend API key                                                  |
-| `EMAIL_FROM`                                | Yes      | Verified sender address                                         |
+
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Yes      | Google OAuth                                                    |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Yes      | GitHub OAuth                                                    |
 | `PORT`                                      | No       | Default `8000`                                                  |
@@ -136,7 +134,7 @@ Loaded via `dotenv/config` in `server.ts` and validated fail-fast in [`src/lib/e
 | API Keys        | `/api/projects/:projectId/api-keys` + `/api/api-key/:id`           | Session (owner only; raw key returned once) | [API Key API](docs/api/api-key.md)               |
 | Logs            | `GET /api/projects/:projectId/logs` (paginated, filterable)        | Session (member)                            | [Log Event API](docs/api/log-event.md)           |
 | User            | `GET /api/user/me`                                                 | Session                                     | [User API](docs/api/user.md)                     |
-| Auth            | `/api/auth/*` (Better Auth + `POST /api/auth/resend-verification`) | Mixed / rate-limited per-path               | [Authentication](docs/backend/authentication.md) |
+| Auth            | `/api/auth/*` (Better Auth)                                        | Mixed / rate-limited per-path               | [Authentication](docs/backend/authentication.md) |
 | Ops             | `GET /health`, `GET /readiness`, `GET /`                           | Public                                      | `src/app.ts`                                     |
 | Realtime        | WS upgrade (session required) + `project.subscribe`                | Session + `ensureProjectMember`             | [Realtime](docs/backend/realtime.md)             |
 
@@ -144,7 +142,7 @@ Validation via Zod (`validate` middleware for bodies); error shape `{ success:fa
 
 ## Database
 
-PostgreSQL via Prisma 7 multi-schema (`prisma/schema/`). Models: `User`, `Session`, `Account`, `Verification` (Better Auth); `Organization`, `OrganizationMember` (`OWNER`/`MEMBER`); `Project` (case-insensitive unique name per org via `lower(name)` index); `ApiKey` (hashed, `revokedAt` soft-delete); `LogEvent` (indexed `[projectId, occurredAt]` / `[projectId, level]`). Cascades: org → projects → keys/logs; user deletion `SetNull` on `ApiKey.createdBy`.
+PostgreSQL via Prisma 7 multi-schema (`prisma/schema/`). Models: `User`, `Session`, `Account` (Better Auth); `Organization`, `OrganizationMember` (`OWNER`/`MEMBER`); `Project` (case-insensitive unique name per org via `lower(name)` index); `ApiKey` (hashed, `revokedAt` soft-delete); `LogEvent` (indexed `[projectId, occurredAt]` / `[projectId, level]`). Cascades: org → projects → keys/logs; user deletion `SetNull` on `ApiKey.createdBy`.
 
 See [Schema](docs/database/schema.md), [Relationships](docs/database/relationships.md), [Migrations](docs/database/migrations.md).
 

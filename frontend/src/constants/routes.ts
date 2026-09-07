@@ -4,15 +4,6 @@ export const ROUTES = {
 
   AUTH: {
     SIGN_IN: "/sign-in",
-    SIGN_UP: "/sign-up",
-
-    VERIFY_EMAIL: "/sign-up/verify-email",
-
-    VERIFIED: "/sign-up/verified",
-
-    FORGOT_PASSWORD: "/sign-in/forgot-password",
-
-    RESET_PASSWORD: "/sign-in/reset-password",
   },
 
   ORGANIZATION: {

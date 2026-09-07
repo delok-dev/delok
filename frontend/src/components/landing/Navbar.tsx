@@ -25,10 +25,9 @@ const NAV_LINKS: readonly NavLink[] = [
 ];
 
 const AUTH_LINKS = [
-  { label: "Sign in", href: ROUTES.AUTH.SIGN_IN, variant: "ghost" as const },
   {
-    label: "Get started",
-    href: ROUTES.AUTH.SIGN_UP,
+    label: "Sign in",
+    href: ROUTES.AUTH.SIGN_IN,
     variant: "primary" as const,
   },
 ] as const;

@@ -3,7 +3,7 @@
 ## `src/lib/auth/auth-client.ts`
 
 - Purpose: Thin wrapper over `better-auth` `createAuthClient`.
-- Public API: `export const authClient` with `signUp.email`, `signIn.email`, `signIn.social`, `requestPasswordReset`, `resetPassword`, `useSession`.
+- Public API: `export const authClient` with `signIn.social`, `useSession`.
 - Config: `baseURL = NEXT_PUBLIC_API_URL` fallback `http://localhost:8000`, throws in production if missing.
 - Consumers: `src/domains/auth/api/auth.service.ts`, `src/providers/AuthRoutingProvider.tsx`, `src/components/landing/HomeGate.tsx`, `src/views/orgs/OrganizationsPage.tsx`.
 - External: `better-auth@1.6.23`.

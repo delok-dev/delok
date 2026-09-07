@@ -129,7 +129,7 @@ The `validate()` middleware uses `safeParse` and returns early **outside the err
 
 **Exceptions (not using the middleware):**
 - **Query params** (e.g., log-event GET): validated inside the controller via `schema.parse(req.query)` — goes through error middleware
-- **Sign-up password** (Better Auth hook): validated in `hooks.before` → throws `APIError`
+
 
 ---
 
@@ -152,14 +152,13 @@ NOT observed: no "business middleware" like `ensureOrganizationOwner` as Express
 
 ## Rule 6: Only `lib/` and `infrastructure/` Import External SDKs
 
-**Observed pattern:** All external service clients are constructed in `lib/` (singletons) or `infrastructure/` (adapters). Modules never import from `better-auth`, `resend`, `ws`, or `delok` SDK directly.
+**Observed pattern:** All external service clients are constructed in `lib/` (singletons) or `infrastructure/` (adapters). Modules never import from `better-auth`, `ws`, or `delok` SDK directly.
 
 | SDK | Constructed in | Used via imported singleton |
 |-----|---------------|-----------------------------|
-| `better-auth` | `lib/auth.ts` → `auth` | `authMiddleware`, `auth.service` |
-| `resend` | `lib/resend.ts` → `resend` | `lib/auth.ts` (email sending) |
+| `better-auth` | `lib/auth.ts` → `auth` | `authMiddleware` |
 | `ws` | `infrastructure/realtime/websocket.ts` → `websocket` | `server.ts` + `realtime.service.ts` |
-| `delok` | `lib/delok.ts` → `delok`, `errorLogger` | authorization.ts (warn), errorMiddleware (error), auth.ts (info), services (info) |
+| `delok` | `lib/delok.ts` → `delok`, `errorLogger` | authorization.ts (warn), errorMiddleware (error), services (info) |
 | `@prisma/client` | `lib/prisma.ts` → `prisma` | All repository files |
 
 **Why?** Configuration is centralized. If an API key or endpoint URL changes, you edit one file. Also, testing can mock the singleton export rather than the SDK constructor.

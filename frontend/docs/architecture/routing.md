@@ -11,12 +11,7 @@
 | `/docs/installation` | `app/docs/installation/page.tsx` | Page |
 | `/docs/logging` | `app/docs/logging/page.tsx` | Page |
 | `/docs/reference/log-event` | `app/docs/reference/log-event/page.tsx` | Page |
-| `/sign-in` | `app/(auth)/sign-in/page.tsx` | Page — route group `(auth)` |
-| `/sign-in/forgot-password` | `app/(auth)/sign-in/forgot-password/page.tsx` | Page |
-| `/sign-in/reset-password` | `app/(auth)/sign-in/reset-password/page.tsx` | Page — expects `?token=` |
-| `/sign-up` | `app/(auth)/sign-up/page.tsx` | Page |
-| `/sign-up/verify-email` | `app/(auth)/sign-up/verify-email/page.tsx` | Page |
-| `/sign-up/verified` | `app/(auth)/sign-up/verified/page.tsx` | Page |
+| `/sign-in` | `app/(auth)/sign-in/page.tsx` | Page — route group `(auth)`, OAuth-only sign-in |
 | `/auth/error` | `app/(auth)/auth/error/page.tsx` | Page |
 | `/orgs` | `app/(root)/orgs/page.tsx` | Page — org list, layout `app/(root)/orgs/layout.tsx` |
 | `/orgs/:organizationSlug` | `app/(root)/orgs/[organizationSlug]/page.tsx` | Dynamic |

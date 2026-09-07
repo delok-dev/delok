@@ -6,10 +6,7 @@
 |------------|---------------|
 | Landing | `app/page.tsx`, `src/components/landing/*` (Hero, LogInvestigation, ProjectsAwareness, FindSignal, GetStarted) |
 | Documentation site | `app/docs/*`, `src/components/docs/*` (5 pages + index) |
-| Sign up / sign in (email+password) | `src/domains/auth/components/SignUpForm.tsx`, `SignInForm.tsx` via `better-auth` |
-| Social login (Google, GitHub) | `src/domains/auth/components/SocialLogin.tsx` via `AuthService.signInGoogle/Github` |
-| Email verification | `src/views/auth/VerifyEmailPage.tsx`, `EmailVerifiedPage.tsx` |
-| Forgot / reset password | `ForgotPasswordForm`, `ResetPasswordForm` |
+| OAuth sign-in (Google, GitHub) | `src/domains/auth/components/SocialLogin.tsx` via `AuthService.signInGoogle/Github` |
 | Organizations CRUD | `src/domains/organization/*`, `src/views/orgs/*` (list, create, getBySlug, update, delete) |
 | Projects CRUD (per org) | `src/domains/project/*`, `src/views/orgs/organization/projects/*` (listByOrganization, create, getById, update, delete) |
 | Project log explorer | `src/domains/log-explorer/components/LogExplorer.tsx`, `src/views/orgs/organization/projects/project/ProjectPage.tsx` (paginated list + filters + detail panel) |
@@ -24,10 +21,8 @@
 
 ```
 Visit / -> AuthRoutingProvider checks session
- ├─ unauthenticated: stay on landing, click Sign In / Sign Up (ROUTES.AUTH.*) -> forms -> better-auth -> toasts + redirect
+ ├─ unauthenticated: stay on landing, click Sign In (ROUTES.AUTH.SIGN_IN) -> OAuth buttons -> better-auth -> redirect
  └─ authenticated + not on /orgs or /docs -> redirect to /orgs/:lastOrg/projects or /orgs
-SignUp -> Verify Email (/sign-up/verify-email) -> Verified (/sign-up/verified)
-SignIn -> Forgot Password (/sign-in/forgot-password) -> Reset Password (/sign-in/reset-password?token=...)
 Social -> OAuth callback -> HOME -> AuthRoutingProvider redirects to orgs
 ```
 
@@ -82,7 +77,7 @@ LogExplorer (layout: LogFilters top, LogsPanel list, LogDetailPanel drawer)
  /orgs/:slug/projects               -> project       -> ProjectsPage      -> useProjects (+ realtime) -> GET /api/organizations/:slug/projects + WS project.log_count.updated
  /orgs/:slug/projects/:projectId    -> log-explorer -> ProjectPage/LogExplorer -> useLogExplorer -> GET /api/projects/:projectId/logs + WS log.created
  /orgs/:slug/projects/:projectId/settings -> project+api-key -> ProjectSettingsView -> useProjectSettings, useProjectApiKeys -> PATCH/DELETE project, GET/POST/PATCH api-keys
- /sign-in,/sign-up                  -> auth         -> SignInForm/SignUpForm -> useSignIn/useSignUp -> better-auth + /api/auth/*
+ /sign-in                           -> auth         -> SignInForm -> SocialLogin -> better-auth + /api/auth/*
 ```
 
 ## Limitations

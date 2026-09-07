@@ -18,9 +18,8 @@ This pattern appears in `auth.service.ts`, `organization.service.ts`, `project.s
 ## Authentication
 
 - Client: `better-auth` `createAuthClient({ baseURL: getAuthBaseURL() })` (`src/lib/auth/auth-client.ts`).
-- Session: `authClient.useSession()` and `authClient.signIn/signUp` via `AuthService`.
-- Custom endpoint: `POST /api/auth/resend-verification` is called via raw `fetch` (`src/domains/auth/api/auth.service.ts`).
-- Social: `authClient.signIn.social({provider:"google"|"github", callbackURL:...})`.
+- Session: `authClient.useSession()` and `authClient.signIn.social` via `AuthService`.
+- Social: `authClient.signIn.social({provider:"google"|"github", callbackURL:...})` — the only authentication method.
 
 ## API Endpoints
 
@@ -80,4 +79,4 @@ Response shape: `{ data: T }` on success; errors are `{ error:{code,message}}` o
 
 - `NEXT_PUBLIC_API_URL` — HTTP API base (fallback `http://localhost:8000`, required in production)
 - `NEXT_PUBLIC_WS_URL` — WebSocket URL (fallback `ws://localhost:8000`, required `wss://` on https/production)
-- `NEXT_PUBLIC_APP_URL` — used for password reset `redirectTo` and OAuth `callbackURL`
+- `NEXT_PUBLIC_APP_URL` — used for OAuth `callbackURL`

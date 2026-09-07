@@ -18,8 +18,6 @@ import { organizationProjectRoute } from "./modules/project/routes/organization-
 import { apiKeyRoute } from "./modules/api-key/routes/api-key.route.js";
 import { projectApiKeyRoute } from "./modules/api-key/routes/project-api-key.route.js";
 import { authRateLimiter } from "./middlewares/rate-limit/auth-rate-limit.middleware.js";
-import { authRoute } from "./modules/auth/auth.route.js";
-
 export const app = express();
 
 // Trust proxy: required for correct req.ip behind reverse proxy (rate limiting, logging)
@@ -61,7 +59,6 @@ app.use(
 
 // auth route better auth setting
 app.use("/api/auth", authRateLimiter);
-app.use("/api/auth", authRoute);
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json({ limit: "1mb" }));

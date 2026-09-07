@@ -7,7 +7,7 @@ Reusable and domain-agnostic. All use `clsx` + Tailwind tokens (`bg-surface`, `b
 | Component | File | Props | Consumers |
 |-----------|------|-------|-----------|
 | `Button` | `ui/Button.tsx` | variant `primary\|secondary\|danger\|success\|ghost`, size `sm\|md\|lg`, `loading`, `href` (renders as Next `Link`) | Domain modals, `not-found.tsx`, `LogExplorer`, auth forms |
-| `Input` | `ui/Input.tsx` | `label`, `error`, `helperText`, password toggle with `showPassword` state | `SignInForm`, `SignUpForm`, `CreateOrganizationModal`, `CreateProjectModal`, `GenerateApiKeyModal` |
+| `Input` | `ui/Input.tsx` | `label`, `error`, `helperText`, password toggle with `showPassword` state | `CreateOrganizationModal`, `CreateProjectModal`, `GenerateApiKeyModal` |
 | `Modal` | `ui/Modal.tsx` | `open`, `onClose`, `title`, `description`, portal to `document.body`, Escape close | `CreateOrganizationModal`, `CreateProjectModal`, `GenerateApiKeyModal` |
 | `ConfirmModal` | `ui/ConfirmModal.tsx` | Wraps `Modal` + `Button` danger variant | `OrganizationDangerZone`, `ProjectDangerZone`, `ApiKeyList` revoke |
 | `Card` | `ui/Card.tsx` | — | `OrganizationCard`, `ProjectCard` |
@@ -16,7 +16,7 @@ Reusable and domain-agnostic. All use `clsx` + Tailwind tokens (`bg-surface`, `b
 | `EmptyState` | `ui/EmptyState.tsx` | `title`, `description`, `action` | `OrganizationEmptyState`, `ProjectEmptyState`, `LogsPanel` empty |
 | `Skeleton` | `ui/Skeleton.tsx` | — | `OrganizationListSkeleton`, `ProjectListSkeleton` |
 | `Loader` | `ui/Loader.tsx` | `label` — 3-bar `animate-delok-loader-bar` | `ProjectPage`, `OrganizationsLoading` |
-| `toast` | `ui/toast.tsx` | Wrapper over `sonner` `Toaster` at `app/layout.tsx` | `useSignUp`, `useOrganizations`, etc. |
+| `toast` | `ui/toast.tsx` | Wrapper over `sonner` `Toaster` at `app/layout.tsx` | `useOrganizations`, etc. |
 
 Exported via `src/components/ui/index.ts`.
 

@@ -1,6 +1,6 @@
 # Authentication
 
-Delok uses **Better Auth** (`better-auth` v1.6.23) as its authentication framework. The project supports email+password (with verification), Google OAuth, and GitHub OAuth. All session storage is database-backed via Prisma.
+Delok uses **Better Auth** (`better-auth` v1.6.23) as its authentication framework. The project supports Google OAuth and GitHub OAuth only. All session storage is database-backed via Prisma.
 
 ## Better Auth Integration
 
@@ -23,8 +23,6 @@ DATABASE_URL            # PostgreSQL connection string
 BETTER_AUTH_SECRET      # Session signing secret
 BETTER_AUTH_URL         # Public backend URL (e.g. http://localhost:8000) — used for baseURL
 FRONTEND_URL            # Frontend origin (e.g. http://localhost:3000) — used for trustedOrigins/errorURL/CORS
-RESEND_API_KEY          # Resend transactional email key
-EMAIL_FROM              # Verified sender address
 GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET
 GITHUB_CLIENT_ID
@@ -33,21 +31,6 @@ PORT                    # optional, default 8000
 NODE_ENV                # development | production | test, default development
 ```
 
-### Password Auth (`emailAndPassword`)
-
-- `enabled: true`
-- Min password length: 8, max: 128 (Better Auth defaults)
-- Additional complexity enforced via custom hook (see below)
-- `requireEmailVerification: true` — users must verify email before actions (actual enforcement of this flag is Better Auth's own logic)
-
-**Password reset email** is sent via Resend with a Delok-branded template (`lib/auth.ts:32` `sendResetPassword` → `email.service.ts`).
-
-### Email Verification
-
-- `sendOnSignIn: true` — Better Auth will re-send a verification email if an unverified user signs in
-- Custom URL rewrite: the verification link's `callbackURL` is set to `` `${env.FRONTEND_URL}/sign-up/verified` `` so the frontend controls the post-verification UX
-- Email send failure is thrown after logging inside `email.service` (no Delok self-monitoring SDK in current code)
-
 ### Social Providers
 
 | Provider | Config | Scopes/Permissions |
@@ -55,33 +38,11 @@ NODE_ENV                # development | production | test, default development
 | Google | `google.clientId`, `google.clientSecret` | Default Better Auth Google scopes (inferred, not explicitly configured in code) |
 | GitHub | `github.clientId`, `github.clientSecret` | Default Better Auth GitHub scopes (inferred, not explicitly configured in code) |
 
-## Password Validation Hook
-
-The default Better Auth password length check is enhanced with a custom `hooks.before` middleware (runs before the sign-up email handler):
-
-```typescript
-// From auth.ts hooks.before
-if (ctx.path !== "/sign-up/email") return;
-const result = passwordSchema.safeParse(ctx.body.password);
-if (!result.success) {
-  throw new APIError("BAD_REQUEST", { message: result.error.issues[0].message });
-}
-```
-
-The [passwordSchema](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/features/auth/auth.schema.ts) requires:
-- 8–128 characters
-- Uppercase letter
-- Lowercase letter
-- Number
-- Special character (not `[A-Za-z0-9]`)
-
-Failing any of these throws `APIError("BAD_REQUEST")` which Better Auth handles according to its own error flow.
-
 ## Session Handling
 
 ### Storage
 
-Sessions are stored in the `Session` table ([auth.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/auth.prisma#L18-L32)):
+Sessions are stored in the `Session` table ([auth.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/auth.prisma)):
 
 | Field | Meaning |
 |-------|---------|
@@ -96,14 +57,14 @@ Index on `userId` for fast "get all user's sessions" queries.
 
 ### Session Resolution
 
-The [authMiddleware](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/middlewares/auth.middleware.ts#L8-L27) resolves sessions:
+The [authMiddleware](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/middlewares/auth.middleware.ts) resolves sessions:
 
 1. Extracts cookies from Node headers via `fromNodeHeaders(req.headers)`
 2. Calls `auth.api.getSession({ headers })` (Better Auth's server-side session resolver)
 3. If session → sets `req.session` (declared on Express via [types/express.d.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/types/express.d.ts) type augmentation)
 4. If no session → throws `AppError("unauthorized", 401)`
 
-`req.session` shape (Better Auth session type): `{ user: { id, name, email, emailVerified, image, createdAt, updatedAt }, ...sessionProps }`.
+`req.session` shape (Better Auth session type): `{ user: { id, name, email, image, createdAt, updatedAt }, ...sessionProps }`.
 
 ## Authentication Middleware Mounting
 
@@ -148,21 +109,16 @@ Key security properties:
 
 ## Auth Route Mounting
 
-From [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts#L44-L46):
+From [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts):
 
 ```typescript
 app.use("/api/auth", authRateLimiter);
-app.use("/api/auth", authRoute);                     // Custom: resend-verification
 app.all("/api/auth/*splat", toNodeHandler(auth));    // Catch-all: Better Auth built-in
 ```
 
 The order is important:
 1. Path-specific rate limits run first
-2. Custom endpoints in `authRoute` (POST `/api/auth/resend-verification`) match before the catch-all
-3. Everything else under `/api/auth/*` is handled by Better Auth's Node.js adapter
-
-Custom auth endpoints:
-- `POST /api/auth/resend-verification` → [auth.controller.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/auth/auth.controller.ts) → silently exits if user not found or already verified (prevents user enumeration), otherwise calls `auth.api.sendVerificationEmail`
+2. Everything under `/api/auth/*` is handled by Better Auth's Node.js adapter
 
 ## Auth Rate Limiting
 
@@ -170,10 +126,7 @@ Auth endpoints are protected by [auth-rate-limit.middleware.ts](file:///c:/Users
 
 | Path | Window | Limit |
 |------|--------|-------|
-| `/sign-in/email` | 15 min | 5 attempts |
-| `/sign-up/email` | 60 min | 5 attempts |
 | `/sign-out` | 5 min | 30 attempts |
-| `/request-password-reset` | 60 min | 3 attempts |
-| `/resend-verification` | 60 min | 5 attempts |
+| Other auth paths | 15 min | 20 attempts |
 
 These use `express-rate-limit`. On breach, returns `429 RATE_LIMIT_EXCEEDED` via the `errorResponse` helper (formatted like error middleware output).

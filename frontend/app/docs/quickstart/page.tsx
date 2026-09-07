@@ -22,7 +22,7 @@ export default function QuickstartPage() {
           Quickstart
         </h1>
         <p className="text-base leading-relaxed text-muted-foreground">
-          From account to first log. create your project, get an API key, and
+          From sign-in to first log. Create your project, get an API key, and
           send a structured event.
         </p>
       </header>
@@ -44,21 +44,14 @@ export default function QuickstartPage() {
           2. Log in to Delok
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Create an account or sign in at{" "}
-          <span className="font-mono text-foreground">/sign-up</span> and{" "}
+          Sign in with your Google or GitHub account at{' '}
           <span className="font-mono text-foreground">/sign-in</span>. After
           authentication you will be redirected to your organizations.
         </p>
         <div className="flex gap-2">
           <Link
-            href={ROUTES.AUTH.SIGN_UP}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
-          >
-            Create account
-          </Link>
-          <Link
             href={ROUTES.AUTH.SIGN_IN}
-            className="inline-flex items-center justify-center rounded-md border border-border bg-surface px-3 py-1.5 text-sm font-medium text-foreground hover:bg-surface-hover"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
           >
             Sign in
           </Link>

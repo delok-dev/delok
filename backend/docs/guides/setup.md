@@ -26,20 +26,20 @@ npm install
 ```
 
 This installs:
-- Runtime dependencies: express, better-auth, prisma, zod, ws, cors, express-rate-limit, resend, delok SDK, etc.
+- Runtime dependencies: express, better-auth, prisma, zod, ws, cors, express-rate-limit, delok SDK, etc.
 - Dev dependencies: tsx, typescript, @types/*
 
 ---
 
 ## 2. Configure Environment Variables
 
-Create a `.env` file in the repository root. The backend loads `dotenv/config` first thing in [server.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/server.ts#L3).
+Create a `.env` file in the repository root. The backend loads `dotenv/config` first thing in [server.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/server.ts).
 
 ### Required Variables
 
 | Variable | Example | Purpose |
 |----------|---------|---------|
-| `DATABASE_URL` | `postgresql://user:pass@localhost:5432/delok?schema=public` | PostgreSQL connection string. Read by Prisma via [prisma.config.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma.config.ts#L12) and by `lib/prisma.ts` (adapter-pg). |
+| `DATABASE_URL` | `postgresql://user:pass@localhost:5432/delok?schema=public` | PostgreSQL connection string. Read by Prisma via [prisma.config.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma.config.ts) and by `lib/prisma.ts` (adapter-pg). |
 | `PORT` | `8000` | HTTP/WebSocket port (`env.PORT`, default 8000). |
 | `BETTER_AUTH_SECRET` | `replace-with-32plus-random-string` | Session signing secret. **Throws at startup if missing.** |
 | `BETTER_AUTH_URL` | `http://localhost:8000` | Public URL of this backend (used by Better Auth `baseURL`). |
@@ -48,8 +48,6 @@ Create a `.env` file in the repository root. The backend loads `dotenv/config` f
 | `GOOGLE_CLIENT_SECRET` | `GOCSPX-...` | Google OAuth client secret. **Throws at startup if missing.** |
 | `GITHUB_CLIENT_ID` | `Iv1.abc...` | GitHub OAuth client ID. **Throws at startup if missing.** |
 | `GITHUB_CLIENT_SECRET` | `...` | GitHub OAuth client secret. **Throws at startup if missing.** |
-| `RESEND_API_KEY` | `re_...` | Resend API key for sending verification emails + password reset emails. |
-| `EMAIL_FROM` | `Delok <onboarding@resend.dev>` | Verified sender address. |
 | `NODE_ENV` | `development` | `development` / `production` / `test`. |
 
 ### OAuth Provider Setup
@@ -145,7 +143,7 @@ No output = success. This checks all `.ts` files in `src/` (per tsconfig's `"inc
 ## Common Setup Issues
 
 ### Problem: `Error: Google OAuth env missing` on startup
-The `GOOGLE_CLIENT_ID` or `GOOGLE_CLIENT_SECRET` env vars are unset. Both are validated at the top of [lib/auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts#L11-L23) (along with GitHub equivalents). Fill in all four OAuth env vars.
+The `GOOGLE_CLIENT_ID` or `GOOGLE_CLIENT_SECRET` env vars are unset. Both are validated at the top of [lib/auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts) (along with GitHub equivalents). Fill in all four OAuth env vars.
 
 ### Problem: Prisma Client not found
 Error: `Cannot find module '../generated/prisma/client'`. Solution:
@@ -154,14 +152,9 @@ npm run db:generate
 ```
 
 ### Problem: CORS errors when frontend calls backend
-CORS origin is configured via `FRONTEND_URL` env var — see [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts#L53-L60) `origin: [env.FRONTEND_URL]` and `.env.example` `FRONTEND_URL=http://localhost:3000`. If your frontend runs on a different port or a deployed URL, set `FRONTEND_URL` accordingly.
+CORS origin is configured via `FRONTEND_URL` env var — see [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts) `origin: [env.FRONTEND_URL]` and `.env.example` `FRONTEND_URL=http://localhost:3000`. If your frontend runs on a different port or a deployed URL, set `FRONTEND_URL` accordingly.
 
 Allowed headers include `x-api-key` (needed for ingestion calls). If you add new custom headers, update `allowedHeaders`.
-
-### Problem: Email sending fails (verification / password reset)
-If `RESEND_API_KEY` is missing or invalid, the `sendVerificationEmail` handler in auth.ts catches and logs the error via `delok.error()` then rethrows. You'll see the error in both the backend console AND (if the backend is sending to itself successfully) in your Delok logs.
-
-For development you can also use Resend's test mode / sandbox. The `from` address is hardcoded to `"Delok <onboarding@resend.dev>"` (the Resend demo sender), which only works when sending to your Resend-registered email addresses. For production, change this to a verified domain.
 
 ---
 
@@ -173,4 +166,4 @@ The project now includes `Dockerfile` (multi-stage `builder` → `runner`, Node 
 2. **DB migrations**: `npm run db:migrate` (= `prisma migrate deploy`) before starting app
 3. **Start**: `npm start` → `node dist/server.js`
 4. **Docker**: `docker build -t delok-backend . && docker run -e DATABASE_URL=... -p 8000:8000 delok-backend`
-5. **Env vars**: Same as development except `BETTER_AUTH_URL` points to the production origin, `FRONTEND_URL` to production frontend, OAuth apps configured with production callbacks, `DATABASE_URL` to production PostgreSQL, production `RESEND_API_KEY` and `EMAIL_FROM`.
+5. **Env vars**: Same as development except `BETTER_AUTH_URL` points to the production origin, `FRONTEND_URL` to production frontend, OAuth apps configured with production callbacks, `DATABASE_URL` to production PostgreSQL.

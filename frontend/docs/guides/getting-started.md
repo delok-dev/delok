@@ -25,7 +25,7 @@ Open `http://localhost:3000`.
 |-----|----------|---------------|------------|
 | `NEXT_PUBLIC_API_URL` | Yes in prod | `http://localhost:8000` | `src/lib/auth/auth-client.ts:8`, all `*.service.ts` |
 | `NEXT_PUBLIC_WS_URL` | Yes in prod | `ws://localhost:8000` | `src/lib/websocket/websocket.ts:8` |
-| `NEXT_PUBLIC_APP_URL` | No (but needed for password reset/OAuth) | — | `src/domains/auth/api/auth.service.ts:33,58` |
+| `NEXT_PUBLIC_APP_URL` | No (but needed for OAuth callback) | — | `src/domains/auth/api/auth.service.ts` |
 
 Production requires `NEXT_PUBLIC_WS_URL` to be `wss://` when served over `https` (`src/lib/websocket/websocket.ts:17-25`).
 
