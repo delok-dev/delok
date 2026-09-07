@@ -14,12 +14,12 @@
 - Purpose: Singleton `WebSocketManager` (`websocket.ts`) — single WS connection shared app-wide.
 - Public API: `connect()`, `disconnect()`, `subscribe(projectId)`, `unsubscribe(projectId)`, `on<T>(type, handler) => unsubscribe`. Types in `realtime.types.ts`: `RealtimeEvent = { "log.created": LogEvent, "project.log_count.updated": {projectId,logCount}}`.
 - Internals: `attempt` + exponential backoff (`1s*2^attempt` cap 30s), `resubscribeAll` on open, `handleMessage` JSON parse + dispatch to `handlers` map. Validates `wss://` on https and in production.
-- Consumers: `SocketProvider` (lifecycle), `useLogExplorerRealtime`, `useProjectsRealtime`.
+- Consumers: `SocketProvider` (lifecycle, mounted in `app/(root)/orgs/layout.tsx` — not globally), `useLogExplorerRealtime`, `useProjectsRealtime`.
 - Backend relation: Expects messages `{type, data}` and `project.subscribe/unsubscribe` protocol. URL `NEXT_PUBLIC_WS_URL`.
 
 ## `src/providers/`
 
-`AppProvider` composes `ThemeProvider` (`next-themes`), `QueryProvider` (`QueryClient` stale 30s), `SocketProvider`, `AuthRoutingProvider`. See `providers.md`.
+`AppProvider` composes `ThemeProvider` (`next-themes`), `QueryProvider` (`QueryClient` stale 30s), `AuthRoutingProvider`. `SocketProvider` is mounted separately in `app/(root)/orgs/layout.tsx` so public pages never open a WebSocket. See `providers.md`.
 
 ## `src/constants/`
 

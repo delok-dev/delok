@@ -8,10 +8,11 @@ Mounted once in `app/layout.tsx`:
 AppProvider (src/providers/AppProvider.tsx)
  └─ ThemeProvider (src/providers/ThemeProvider.tsx)
      └─ QueryProvider (src/providers/QueryProvider.tsx)
-         └─ SocketProvider (src/providers/SocketProvider.tsx)
-             └─ AuthRoutingProvider (src/providers/AuthRoutingProvider.tsx)
-                 └─ {children}
+         └─ AuthRoutingProvider (src/providers/AuthRoutingProvider.tsx)
+             └─ {children}
 ```
+
+`SocketProvider` is **not** part of the global hierarchy. It is mounted in `app/(root)/orgs/layout.tsx`, inside the authenticated organization area, so the WebSocket connection is only established on pages that actually need realtime — never on public pages (`/`, `/sign-in`, `/docs`).
 
 ## Provider Details
 
@@ -19,7 +20,7 @@ AppProvider (src/providers/AppProvider.tsx)
 |----------|------|----------|-----------|
 | `ThemeProvider` | `src/providers/ThemeProvider.tsx` | `next-themes` with `attribute="class"`, `defaultTheme="system"`, `enableSystem` | Components using `useTheme()` or `.light` class |
 | `QueryProvider` | `src/providers/QueryProvider.tsx` | Single `QueryClient` (`staleTime: 30s`, `retry:1`, `refetchOnWindowFocus:false`) | `useOrganizations`, `useProjects`, `useProject`, `useProjectApiKeys` |
-| `SocketProvider` | `src/providers/SocketProvider.tsx` | Calls `websocketManager.connect()` on mount, `disconnect()` on unmount | Realtime hooks (`useLogExplorerRealtime`, `useProjectsRealtime`) |
+| `SocketProvider` | `src/providers/SocketProvider.tsx` | Calls `websocketManager.connect()` on mount, `disconnect()` on unmount. Mounted in `app/(root)/orgs/layout.tsx` | Realtime hooks (`useLogExplorerRealtime`, `useProjectsRealtime`) |
 | `AuthRoutingProvider` | `src/providers/AuthRoutingProvider.tsx` | Redirect for authenticated users outside `/orgs` and `/docs` | Uses `usePathname()`, `useRouter()`, `authClient.useSession()` |
 
 ### AuthRoutingProvider Logic
@@ -30,9 +31,9 @@ AppProvider (src/providers/AppProvider.tsx)
 
 ### Interactions
 
-- `ThemeProvider` is outermost so the theme class is available before queries and sockets.
-- `QueryProvider` wraps `SocketProvider` consumers that call `queryClient.setQueryData` (`useProjectsRealtime`).
-- `SocketProvider` owns the WebSocket lifecycle via the `websocketManager` singleton.
+- `ThemeProvider` is outermost so the theme class is available before queries.
+- `QueryProvider` wraps realtime consumers that call `queryClient.setQueryData` (`useProjectsRealtime`); realtime hooks are all rendered under `app/(root)/orgs`, so they stay inside the `QueryProvider` subtree.
+- `SocketProvider` owns the WebSocket lifecycle via the `websocketManager` singleton, scoped to the authenticated organization area.
 
 ## Session Access
 

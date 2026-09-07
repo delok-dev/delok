@@ -4,16 +4,17 @@
 import { ReactNode } from "react";
 import { QueryProvider } from "./QueryProvider";
 import { ThemeProvider } from "./ThemeProvider";
-import { SocketProvider } from "./SocketProvider";
 import { AuthRoutingProvider } from "./AuthRoutingProvider";
+
+// Note: SocketProvider is intentionally NOT mounted here. It is mounted in
+// app/(root)/orgs/layout.tsx so the WebSocket connection is only established
+// inside the authenticated organization area, never on public pages.
 
 export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <QueryProvider>
-        <SocketProvider>
-          <AuthRoutingProvider>{children}</AuthRoutingProvider>
-        </SocketProvider>
+        <AuthRoutingProvider>{children}</AuthRoutingProvider>
       </QueryProvider>
     </ThemeProvider>
   );
