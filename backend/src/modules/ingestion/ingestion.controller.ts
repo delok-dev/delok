@@ -2,6 +2,7 @@
 
 import { Request, Response } from "express";
 import { AppError } from "../../utils/AppError.js";
+import { delok } from "../../lib/delok.js";
 import { createLogEventService } from "./ingestion.service.js";
 
 /**
@@ -13,6 +14,10 @@ export const createLogEventController = async (req: Request, res: Response) => {
   const apiKey = req.get("x-api-key");
 
   if (!apiKey) {
+    delok.warn({
+      event: "ingestion.auth_failed",
+      message: "Ingestion rejected: missing API key",
+    });
     throw new AppError("API key required", 401);
   }
 

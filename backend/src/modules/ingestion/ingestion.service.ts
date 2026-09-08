@@ -11,6 +11,7 @@ import {
 } from "./ingestion.repository.js";
 
 import { sha256 } from "../../utils/hash.js";
+import { delok } from "../../lib/delok.js";
 import { realtime } from "../../infrastructure/realtime/realtime.service.js";
 
 /**
@@ -33,10 +34,20 @@ export const createLogEventService = async (
   const apiKey = await findApiKeyByKeyHash(keyHash);
 
   if (!apiKey) {
+    delok.warn({
+      event: "ingestion.auth_failed",
+      message: "Ingestion rejected: invalid API key",
+      payload: { keyPrefix: key.slice(0, 12) },
+    });
     throw new AppError("Invalid API key", 401, "INVALID_API_KEY");
   }
 
   if (apiKey.revokedAt) {
+    delok.warn({
+      event: "ingestion.auth_failed",
+      message: "Ingestion rejected: revoked API key",
+      payload: { apiKeyId: apiKey.id, projectId: apiKey.projectId },
+    });
     throw new AppError("API Key already revoked", 401);
   }
 

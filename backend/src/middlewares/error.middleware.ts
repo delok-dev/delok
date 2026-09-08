@@ -3,6 +3,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AppError } from "../utils/AppError.js";
 import { Prisma } from "../generated/prisma/client.js";
+import { delok } from "../lib/delok.js";
 
 const getErrorInfo = (error: unknown) => {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -94,6 +95,34 @@ export const errorMiddleware = async (
         stack: error.stack,
       }),
     );
+    const isPrismaError =
+      error instanceof Prisma.PrismaClientKnownRequestError ||
+      error instanceof Prisma.PrismaClientInitializationError ||
+      error instanceof Prisma.PrismaClientRustPanicError;
+    if (isPrismaError) {
+      delok.error({
+        event: "database.query_failed",
+        message: error.message,
+        payload: {
+          errorCode,
+          path: req.path,
+          method: req.method,
+          error: error.message,
+        },
+      });
+    } else {
+      delok.error({
+        event: "system.error",
+        message: error.message,
+        payload: {
+          errorCode,
+          statusCode,
+          path: req.path,
+          method: req.method,
+          error: error.message,
+        },
+      });
+    }
   }
 
   res.status(statusCode).json({

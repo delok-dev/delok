@@ -1,6 +1,7 @@
 // /src/modules/organization/organization.service.ts
 
 import { generateSlug } from "../../utils/generate-slug.js";
+import { delok } from "../../lib/delok.js";
 import {
   ensureOrganizationMember,
   ensureOrganizationOwner,
@@ -21,7 +22,13 @@ export const createOrganizationService = async (
   userId: string,
 ) => {
   const slug = generateSlug(name);
-  return createOrganization(name, slug, userId);
+  const organization = await createOrganization(name, slug, userId);
+  delok.info({
+    event: "organization.created",
+    message: `Organization created: ${organization.name}`,
+    payload: { organizationId: organization.id, slug: organization.slug, userId },
+  });
+  return organization;
 };
 
 /**
@@ -57,7 +64,13 @@ export const updateOrganizationService = async (
 ) => {
   await ensureOrganizationOwner(slug, userId);
   const newSlug = generateSlug(name);
-  return updateOrganization(slug, newSlug, name);
+  const organization = await updateOrganization(slug, newSlug, name);
+  delok.info({
+    event: "organization.updated",
+    message: `Organization updated: ${organization.name}`,
+    payload: { organizationId: organization.id, slug: organization.slug, userId },
+  });
+  return organization;
 };
 
 /**
@@ -72,5 +85,11 @@ export const deleteOrganizationService = async (
 ) => {
   await ensureOrganizationOwner(slug, userId);
 
-  return deleteOrganization(slug);
+  const organization = await deleteOrganization(slug);
+  delok.info({
+    event: "organization.deleted",
+    message: `Organization deleted: ${organization.name}`,
+    payload: { organizationId: organization.id, slug: organization.slug, userId },
+  });
+  return organization;
 };

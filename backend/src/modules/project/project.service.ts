@@ -1,5 +1,6 @@
 // /src/modules/project/project.service.ts
 
+import { delok } from "../../lib/delok.js";
 import {
   ensureOrganizationMember,
   ensureOrganizationOwner,
@@ -24,7 +25,18 @@ export const createProjectService = async (
 ) => {
   const organization = await ensureOrganizationOwner(organizationSlug, userId);
 
-  return await createProject(name, organization.organizationId);
+  const project = await createProject(name, organization.organizationId);
+  delok.info({
+    event: "project.created",
+    message: `Project created: ${project.name}`,
+    payload: {
+      projectId: project.id,
+      organizationId: organization.organizationId,
+      organizationSlug,
+      userId,
+    },
+  });
+  return project;
 };
 
 /**
@@ -78,7 +90,13 @@ export const updateProjectService = async (
 
   await ensureProjectInOrganization(projectId, member.organizationId);
 
-  return updateProject(projectId, name);
+  const project = await updateProject(projectId, name);
+  delok.info({
+    event: "project.updated",
+    message: `Project updated: ${project.name}`,
+    payload: { projectId: project.id, organizationId: member.organizationId, userId },
+  });
+  return project;
 };
 
 /**
@@ -98,5 +116,11 @@ export const deleteProjectService = async (
 
   await ensureProjectInOrganization(projectId, member.organizationId);
 
-  return deleteProject(projectId);
+  const project = await deleteProject(projectId);
+  delok.info({
+    event: "project.deleted",
+    message: `Project deleted: ${project.name}`,
+    payload: { projectId: project.id, organizationId: member.organizationId, userId },
+  });
+  return project;
 };

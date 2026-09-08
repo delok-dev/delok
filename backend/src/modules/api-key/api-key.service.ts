@@ -11,6 +11,7 @@ import {
   updateApiKeyName,
 } from "./api-key.repository.js";
 import { sha256 } from "../../utils/hash.js";
+import { delok } from "../../lib/delok.js";
 
 /**
  * Create a new API key for a project.
@@ -43,13 +44,14 @@ export const createApiKeyService = async (
     projectId,
   });
 
-  console.info(
-    JSON.stringify({
-      event: "api-key.created",
-      projectId,
-      organizationId: project.organization.id,
-    }),
-  );
+  delok.info({
+    event: "api_key.created",
+    message: `API key created for project ${project.name}`,
+    payload: {
+      projectId: project.id,
+      userId,
+    },
+  });
 
   return {
     key: rawKey,
@@ -91,6 +93,11 @@ export const updateApiKeyNameService = async (
   await ensureProjectManagementAccess(apiKey.projectId, userId);
 
   const updatedApiKey = await updateApiKeyName(id, name);
+  delok.info({
+    event: "api_key.updated",
+    message: `API key updated: ${updatedApiKey.name}`,
+    payload: { apiKeyId: updatedApiKey.id, projectId: apiKey.projectId, userId },
+  });
 
   return {
     message: "API Key name updated",
@@ -122,6 +129,11 @@ export const revokeApiKeyService = async (id: string, userId: string) => {
   await ensureProjectManagementAccess(apiKey.projectId, userId);
 
   const revokedApiKey = await revokeApiKey(id);
+  delok.info({
+    event: "api_key.revoked",
+    message: `API key revoked: ${apiKey.name}`,
+    payload: { apiKeyId: apiKey.id, projectId: apiKey.projectId, userId },
+  });
 
   return {
     message: "Api Key revoked successfully",

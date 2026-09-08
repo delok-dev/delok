@@ -3,6 +3,7 @@
 import { createServer } from "node:http";
 import { env } from "./lib/env.js";
 import { prisma } from "./lib/prisma.js";
+import { delok } from "./lib/delok.js";
 
 import { app } from "./app.js";
 import { websocket, socketUsers } from "./infrastructure/realtime/websocket.js";
@@ -39,6 +40,11 @@ const HOST = "0.0.0.0";
 
 server.listen(PORT, HOST, () => {
   console.info(`Server listening at http://${HOST}:${PORT} [${env.NODE_ENV}]`);
+  delok.info({
+    event: "system.startup",
+    message: `Server started on ${HOST}:${PORT} [${env.NODE_ENV}]`,
+    payload: { port: PORT, host: HOST, environment: env.NODE_ENV },
+  });
 });
 
 // Graceful shutdown
@@ -82,3 +88,19 @@ async function gracefulShutdown(signal: string) {
 
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+process.on("uncaughtException", (err) => {
+  delok.fatal({
+    event: "system.uncaught_exception",
+    message: err instanceof Error ? err.message : String(err),
+    payload: { error: err instanceof Error ? err.message : String(err) },
+  });
+});
+
+process.on("unhandledRejection", (reason) => {
+  delok.error({
+    event: "system.unhandled_rejection",
+    message: String(reason),
+    payload: { error: reason instanceof Error ? reason.message : String(reason) },
+  });
+});

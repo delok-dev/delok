@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
 import { AppError } from "../utils/AppError.js";
+import { delok } from "../lib/delok.js";
 
 export const authMiddleware = async (
   req: Request,
@@ -18,6 +19,11 @@ export const authMiddleware = async (
   console.log("CHECK SESSION");
 
   if (!session) {
+    delok.warn({
+      event: "auth.unauthorized",
+      message: `Unauthorized access to ${req.method} ${req.path}`,
+      payload: { method: req.method, path: req.path },
+    });
     throw new AppError("unauthorized", 401);
   }
 
