@@ -11,6 +11,7 @@ import {
   useOrganization,
 } from "@/src/domains/organization";
 
+import { delok } from "@/src/lib/delok/client";
 import { ROUTES } from "@/src/constants/routes";
 import { formatDateTime } from "@/src/utils/format-date";
 
@@ -34,21 +35,28 @@ export function OrganizationSettingsView({
   const isDeleting = deleteOrganization.isPending;
 
   const handleUpdate = async (name: string) => {
-    const updated = await updateOrganization.mutateAsync({ name });
-
-    // The URL contains the old slug after a rename, so follow the
-    // organization to its new projects route.
-    if (updated.slug && updated.slug !== organizationSlug) {
-      router.replace(ROUTES.ORGANIZATION.PROJECTS(updated.slug));
+    try {
+      const updated = await updateOrganization.mutateAsync({ name });
+      delok.info({ event: "organization.updated", message: `Organization renamed: ${updated.name}`, payload: { organizationSlug, newSlug: updated.slug } });
+      if (updated.slug && updated.slug !== organizationSlug) {
+        router.replace(ROUTES.ORGANIZATION.PROJECTS(updated.slug));
+      }
+    } catch (error) {
+      delok.error({ event: "organization.update_failed", message: "Failed to update organization", payload: { organizationSlug, error: error instanceof Error ? error.message : String(error) } });
+      throw error;
     }
   };
 
   const handleDelete = async () => {
-    await deleteOrganization.mutateAsync();
-
-    showToast({ message: "Organization deleted", type: "success" });
-
-    router.replace(ROUTES.ORGANIZATION.ROOT);
+    try {
+      await deleteOrganization.mutateAsync();
+      delok.info({ event: "organization.deleted", message: `Organization deleted: ${organizationSlug}`, payload: { organizationSlug } });
+      showToast({ message: "Organization deleted", type: "success" });
+      router.replace(ROUTES.ORGANIZATION.ROOT);
+    } catch (error) {
+      delok.error({ event: "organization.delete_failed", message: "Failed to delete organization", payload: { organizationSlug, error: error instanceof Error ? error.message : String(error) } });
+      throw error;
+    }
   };
 
   return (

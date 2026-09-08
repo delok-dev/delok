@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { QueryProvider } from "./QueryProvider";
 import { ThemeProvider } from "./ThemeProvider";
 import { AuthRoutingProvider } from "./AuthRoutingProvider";
+import { GlobalErrorHandler } from "@/src/lib/delok/GlobalErrorHandler";
 
 // Note: SocketProvider is intentionally NOT mounted here. It is mounted in
 // app/(root)/orgs/layout.tsx so the WebSocket connection is only established
@@ -16,6 +17,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       <QueryProvider>
         <AuthRoutingProvider>{children}</AuthRoutingProvider>
       </QueryProvider>
+      <GlobalErrorHandler />
     </ThemeProvider>
   );
 }

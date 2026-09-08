@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { authClient } from "@/src/lib/auth/auth-client";
+import { delok } from "@/src/lib/delok/client";
 import { ROUTES } from "@/src/constants/routes";
 import { UserAvatar } from "./UserAvatar";
 
@@ -23,9 +24,11 @@ export function UserMenu({ userName, userEmail }: UserMenuProps) {
     authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
+          delok.info({ event: "auth.sign_out", message: "User signed out" });
           router.push(ROUTES.HOME);
         },
-        onError: () => {
+        onError: (ctx) => {
+          delok.error({ event: "auth.sign_out_failed", message: "Sign out failed", payload: { error: (ctx as unknown as { error?: { message?: string } })?.error?.message ?? "Unknown error" } });
           setLoggingOut(false);
         },
       },

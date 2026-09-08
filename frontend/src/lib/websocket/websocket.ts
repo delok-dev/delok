@@ -1,4 +1,5 @@
 // src/lib/websocket/websocket.ts
+import { delok } from "@/src/lib/delok/client";
 import type { RealtimeEvent } from "./realtime.types";
 
 function getWebSocketUrl(): string {
@@ -144,8 +145,13 @@ class WebSocketManager {
         return;
       }
 
+      const wasReconnecting = this.attempt > 0;
       this.attempt = 0;
       this.resubscribeAll();
+      delok.info({
+        event: wasReconnecting ? "realtime.reconnected" : "realtime.connected",
+        message: wasReconnecting ? "Realtime connection re-established" : "Realtime connection established",
+      });
     };
 
     socket.onmessage = (event) => this.handleMessage(event);
@@ -155,6 +161,7 @@ class WebSocketManager {
         return;
       }
 
+      delok.error({ event: "realtime.connection_failed", message: "Realtime connection error" });
       console.error("[WS] Connection error");
     };
 
@@ -165,10 +172,20 @@ class WebSocketManager {
 
       this.socket = null;
 
+      // Only emit disconnected on first close; reconnect attempts are logged via reconnecting
+      if (this.attempt === 0) {
+        delok.warn({ event: "realtime.disconnected", message: "Realtime connection closed" });
+      }
+
       const delay = Math.min(
         BASE_DELAY_MS * Math.pow(2, this.attempt),
         MAX_DELAY_MS,
       );
+
+      // Log reconnecting once per cycle to avoid spam, throttle after 3 attempts
+      if (this.attempt < 3) {
+        delok.warn({ event: "realtime.reconnecting", message: "Reconnecting realtime", payload: { attempt: this.attempt + 1, delayMs: delay } });
+      }
 
       this.attempt += 1;
 

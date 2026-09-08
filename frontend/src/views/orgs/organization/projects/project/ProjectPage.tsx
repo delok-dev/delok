@@ -11,6 +11,7 @@ import { ProjectHeader, useProject } from "@/src/domains/project";
 
 import { LogExplorer } from "@/src/domains/log-explorer";
 
+import { delok } from "@/src/lib/delok/client";
 import { ROUTES } from "@/src/constants/routes";
 import Link from "next/link";
 import { setLastProjectId } from "@/src/constants/storage";
@@ -28,6 +29,9 @@ export default function ProjectPage() {
   } = useProject(organizationSlug, projectId);
 
   useEffect(() => {
+    if (isError) {
+      delok.error({ event: "project.load_failed", message: "Failed to load project", payload: { organizationSlug, projectId } });
+    }
     if (loadingProject || isError || !project) {
       return;
     }

@@ -13,6 +13,7 @@ import {
   useProjects,
   useProjectsRealtime,
 } from "@/src/domains/project";
+import { delok } from "@/src/lib/delok/client";
 import { clearLastProjectId } from "@/src/constants/storage";
 
 const SORT_OPTIONS = [
@@ -34,7 +35,7 @@ export default function ProjectsPage() {
 
   const organizationSlug = params.organizationSlug;
 
-  const { projects, isLoading } = useProjects(organizationSlug);
+  const { projects, isLoading, isError } = useProjects(organizationSlug);
 
   const [sortBy, setSortBy] = useState<SortOption>("created-desc");
 
@@ -61,6 +62,12 @@ export default function ProjectsPage() {
   useEffect(() => {
     clearLastProjectId(organizationSlug);
   }, [organizationSlug]);
+
+  useEffect(() => {
+    if (isError) {
+      delok.error({ event: "projects.load_failed", message: "Failed to load projects", payload: { organizationSlug } });
+    }
+  }, [isError, organizationSlug]);
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-7xl flex-col p-4 sm:p-6">

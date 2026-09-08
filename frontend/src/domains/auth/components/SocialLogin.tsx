@@ -2,6 +2,7 @@
 "use client";
 
 import Button from "@/src/components/ui/Button";
+import { delok } from "@/src/lib/delok/client";
 import { AuthService } from "../api/auth.service";
 
 export default function SocialLogin() {
@@ -10,7 +11,17 @@ export default function SocialLogin() {
       <Button
         variant="secondary"
         className="w-full flex items-center justify-center"
-        onClick={() => AuthService.signInGoogle()}
+        onClick={async () => {
+          delok.info({ event: "auth.oauth_started", message: "OAuth sign-in started", payload: { provider: "google" } });
+          try {
+            const result = await AuthService.signInGoogle();
+            if (result?.error) {
+              delok.error({ event: "auth.oauth_failed", message: "OAuth sign-in failed", payload: { provider: "google", error: String(result.error.message ?? result.error) } });
+            }
+          } catch (error) {
+            delok.error({ event: "auth.oauth_failed", message: "OAuth sign-in failed", payload: { provider: "google", error: error instanceof Error ? error.message : String(error) } });
+          }
+        }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -40,7 +51,17 @@ export default function SocialLogin() {
       <Button
         variant="secondary"
         className="w-full flex items-center justify-center"
-        onClick={() => AuthService.signInGithub()}
+        onClick={async () => {
+          delok.info({ event: "auth.oauth_started", message: "OAuth sign-in started", payload: { provider: "github" } });
+          try {
+            const result = await AuthService.signInGithub();
+            if (result?.error) {
+              delok.error({ event: "auth.oauth_failed", message: "OAuth sign-in failed", payload: { provider: "github", error: String(result.error.message ?? result.error) } });
+            }
+          } catch (error) {
+            delok.error({ event: "auth.oauth_failed", message: "OAuth sign-in failed", payload: { provider: "github", error: error instanceof Error ? error.message : String(error) } });
+          }
+        }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

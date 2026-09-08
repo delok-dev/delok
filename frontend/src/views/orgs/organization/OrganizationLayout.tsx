@@ -9,6 +9,7 @@ import { Topbar } from "@/src/components/layout/topbar";
 import Loader from "@/src/components/ui/Loader";
 
 import { useOrganization } from "@/src/domains/organization";
+import { delok } from "@/src/lib/delok/client";
 import { STORAGE_KEYS } from "@/src/constants/storage";
 import { ROUTES } from "@/src/constants/routes";
 
@@ -38,6 +39,10 @@ export default function OrganizationLayout({ children }: Props) {
         organizationSlug,
       );
       return;
+    }
+
+    if (isError) {
+      delok.error({ event: "organization.load_failed", message: "Failed to load organization", payload: { organizationSlug } });
     }
 
     if (
