@@ -306,8 +306,8 @@ export function LogsPanel({ data, actions, settingsUrl }: LogsPanelProps) {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  disabled={!pagination.hasPreviousPage}
-                  onClick={() => onPageChange(page - 1)}
+                  disabled={isLoading || page <= 1}
+                  onClick={() => onPageChange(Math.max(page - 1, 1))}
                   className="rounded-md p-1.5 hover:bg-surface-hover disabled:opacity-30"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
@@ -315,8 +315,8 @@ export function LogsPanel({ data, actions, settingsUrl }: LogsPanelProps) {
 
                 <button
                   type="button"
-                  disabled={!pagination.hasNextPage}
-                  onClick={() => onPageChange(page + 1)}
+                  disabled={isLoading || page >= Math.max(pagination.totalPages, 1)}
+                  onClick={() => onPageChange(Math.min(page + 1, Math.max(pagination.totalPages, 1)))}
                   className="rounded-md p-1.5 hover:bg-surface-hover disabled:opacity-30"
                 >
                   <ChevronRight className="h-3.5 w-3.5" />

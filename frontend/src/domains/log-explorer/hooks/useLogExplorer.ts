@@ -40,7 +40,7 @@ export function useLogExplorer({ projectId }: UseLogExplorerOptions) {
     useState<LogPagination>(DEFAULT_PAGINATION);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [page, setPageState] = useState(1);
 
   const [limit, setLimitState] = useState<number>(DEFAULT_LIMIT);
 
@@ -71,19 +71,42 @@ export function useLogExplorer({ projectId }: UseLogExplorerOptions) {
     filters.to,
   );
 
+  const getTotalPages = useCallback(
+    (totalPages: number) => Math.max(1, totalPages),
+    [],
+  );
+
+  const setPage = useCallback(
+    (next: number | ((prev: number) => number)) => {
+      setPageState((prev) => {
+        const raw = typeof next === "function" ? (next as (p: number) => number)(prev) : next;
+        const totalPages = getTotalPages(pagination.totalPages);
+        // pagination ref may be stale inside callback, so also bound by at least 1; final clamp via effect handles totalPages change
+        return Math.min(Math.max(raw, 1), totalPages);
+      });
+    },
+    [pagination.totalPages, getTotalPages],
+  );
+
+  // Clamp page when totalPages shrinks (filter change, deletion, realtime, limit change)
+  useEffect(() => {
+    const totalPages = getTotalPages(pagination.totalPages);
+    setPageState((prev) => Math.min(Math.max(prev, 1), totalPages));
+  }, [pagination.totalPages, getTotalPages]);
+
   const setFilter = useCallback((key: keyof LogFiltersState, value: string) => {
     setFilters((previous) => ({ ...previous, [key]: value }));
-    setPage(1);
+    setPageState(1);
   }, []);
 
   const clearFilters = useCallback(() => {
     setFilters(EMPTY_FILTERS);
-    setPage(1);
+    setPageState(1);
   }, []);
 
   const setLimit = useCallback((next: number) => {
     setLimitState(next);
-    setPage(1);
+    setPageState(1);
   }, []);
 
   // Only the latest fetch request may apply its result, so a slow earlier
