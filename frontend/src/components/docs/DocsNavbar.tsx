@@ -7,6 +7,7 @@ import { Search, Menu, X } from "lucide-react";
 import { ASSETS } from "@/src/constants/assets";
 import { ROUTES } from "@/src/constants/routes";
 import { EXTERNAL_LINKS } from "@/src/constants/external-links";
+import { ThemeToggle } from "@/src/components/ThemeToggle";
 
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -52,6 +53,15 @@ export function DocsNavbar({
           >
             Documentation
           </Link>
+          <button
+            type="button"
+            onClick={onSearchOpen}
+            aria-label="Search documentation"
+            className="inline-flex items-center cursor-pointer justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+          >
+            <Search className="h-5 w-5" />
+          </button>
+          <ThemeToggle />
           <a
             href={EXTERNAL_LINKS.GITHUB}
             target="_blank"
@@ -61,14 +71,6 @@ export function DocsNavbar({
           >
             <GitHubIcon className="h-5 w-5" />
           </a>
-          <button
-            type="button"
-            onClick={onSearchOpen}
-            aria-label="Search documentation"
-            className="inline-flex items-center cursor-pointer justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
-          >
-            <Search className="h-5 w-5" />
-          </button>
           <button
             type="button"
             onClick={onMenuToggle}
