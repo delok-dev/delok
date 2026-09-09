@@ -32,4 +32,9 @@ export const ROUTES = {
     LOGGING: "/docs/logging",
     REFERENCE_LOG_EVENT: "/docs/reference/log-event",
   },
+
+  LEGAL: {
+    PRIVACY: "/privacy",
+    TERMS: "/terms",
+  },
 } as const;

@@ -20,7 +20,9 @@ export function AuthRoutingProvider({ children }: { children: ReactNode }) {
       pathname === ROUTES.ORGANIZATION.ROOT ||
       pathname.startsWith(`${ROUTES.ORGANIZATION.ROOT}/`) ||
       pathname === ROUTES.DOCS.ROOT ||
-      pathname.startsWith(`${ROUTES.DOCS.ROOT}/`)
+      pathname.startsWith(`${ROUTES.DOCS.ROOT}/`) ||
+      pathname === ROUTES.LEGAL.PRIVACY ||
+      pathname === ROUTES.LEGAL.TERMS
     ) {
       return;
     }

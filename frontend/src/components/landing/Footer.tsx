@@ -25,6 +25,8 @@ function GitHubIcon({ className }: { className?: string }) {
 
 const FOOTER_NAV_LINKS = [
   { label: "Documentation", href: EXTERNAL_LINKS.DOCS, external: false },
+  { label: "Privacy", href: "/privacy", external: false },
+  { label: "Terms", href: "/terms", external: false },
   { label: "GitHub", href: EXTERNAL_LINKS.GITHUB, external: true },
 ] as const;
 
