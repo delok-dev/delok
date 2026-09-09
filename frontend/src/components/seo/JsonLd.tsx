@@ -23,7 +23,7 @@ export function WebSiteJsonLd() {
     "@type": "WebSite",
     name: "Delok",
     url: PRODUCTION_URL,
-    description: "Delok is a log monitoring platform for monitoring application logs.",
+    description: "Delok is a log monitoring platform that helps you collect, search, and view application logs in one place.",
   };
   return (
     <script

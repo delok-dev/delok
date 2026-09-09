@@ -5,7 +5,8 @@ import { Callout } from "@/src/components/docs/Callout";
 
 export const metadata: Metadata = {
   title: "Logging",
-  description: "Learn how to send logs with Delok.",
+  description:
+    "Learn how to send structured application logs with info, warn, error, and fatal levels using the Delok SDK.",
   alternates: { canonical: "https://delok.site/docs/logging" },
 };
 

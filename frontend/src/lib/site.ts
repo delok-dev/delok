@@ -9,4 +9,4 @@ export const PRODUCTION_URL = "https://delok.site";
 export const SITE_NAME = "Delok";
 export const SITE_TITLE = "Delok — Log Monitoring Platform";
 export const SITE_DESCRIPTION =
-  "Delok is a log monitoring platform for monitoring application logs.";
+  "Delok is a log monitoring platform that helps you collect, search, and view application logs in one place.";

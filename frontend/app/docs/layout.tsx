@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     template: "%s | Delok Docs",
     default: "Documentation | Delok",
   },
-  description: "Documentation for Delok — a log monitoring platform for monitoring application logs.",
+  description: "Documentation for Delok — learn how to collect, search, and view application logs with the Delok SDK.",
 };
 
 export default function DocsRootLayout({

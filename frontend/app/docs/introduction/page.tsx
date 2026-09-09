@@ -6,7 +6,8 @@ import { ROUTES } from "@/src/constants/routes";
 
 export const metadata: Metadata = {
   title: "Introduction",
-  description: "What Delok is and why you would use it.",
+  description:
+    "Learn what Delok is, how it works, and how to centralize application logs for monitoring and search.",
   alternates: { canonical: "https://delok.site/docs/introduction" },
 };
 

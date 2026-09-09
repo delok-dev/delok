@@ -4,7 +4,8 @@ import { CodeBlock } from "@/src/components/docs/CodeBlock";
 
 export const metadata: Metadata = {
   title: "Installation",
-  description: "Install the Delok SDK.",
+  description:
+    "Install the Delok SDK for Node.js and set up log ingestion in your application.",
   alternates: { canonical: "https://delok.site/docs/installation" },
 };
 
