@@ -7,6 +7,7 @@ import { ROUTES } from "@/src/constants/routes";
 export const metadata: Metadata = {
   title: "Introduction",
   description: "What Delok is and why you would use it.",
+  alternates: { canonical: "https://delok.site/docs/introduction" },
 };
 
 export default function IntroductionPage() {

@@ -6,6 +6,7 @@ import { Callout } from "@/src/components/docs/Callout";
 export const metadata: Metadata = {
   title: "Logging",
   description: "Learn how to send logs with Delok.",
+  alternates: { canonical: "https://delok.site/docs/logging" },
 };
 
 export default function LoggingPage() {

@@ -9,6 +9,7 @@ import { ROUTES } from "@/src/constants/routes";
 export const metadata: Metadata = {
   title: "Quickstart",
   description: "Send your first log with the Delok SDK.",
+  alternates: { canonical: "https://delok.site/docs/quickstart" },
 };
 
 export default function QuickstartPage() {

@@ -5,6 +5,7 @@ import { CodeBlock } from "@/src/components/docs/CodeBlock";
 export const metadata: Metadata = {
   title: "Log Event",
   description: "Understand the structure of a log event sent to Delok.",
+  alternates: { canonical: "https://delok.site/docs/reference/log-event" },
 };
 
 export default function LogEventPage() {

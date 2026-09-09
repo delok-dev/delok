@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { AppProvider } from "@/src/providers/AppProvider";
+import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL, SITE_NAME } from "@/src/lib/site";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/src/components/seo/JsonLd";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -18,9 +20,32 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Delok",
-  description:
-    "Delok is an observability platform that helps developers collect, store, and investigate application logs from multiple projects in a single place.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: "%s | Delok",
+  },
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +60,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
         <AppProvider>{children}</AppProvider>
         <Toaster richColors position="top-right" closeButton />
       </body>

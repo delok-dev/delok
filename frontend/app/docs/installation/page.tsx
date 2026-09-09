@@ -5,6 +5,7 @@ import { CodeBlock } from "@/src/components/docs/CodeBlock";
 export const metadata: Metadata = {
   title: "Installation",
   description: "Install the Delok SDK.",
+  alternates: { canonical: "https://delok.site/docs/installation" },
 };
 
 export default function InstallationPage() {
