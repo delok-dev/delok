@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { ROUTES } from "@/src/constants/routes";
 import { EXTERNAL_LINKS } from "@/src/constants/external-links";
 import { ASSETS } from "@/src/constants/assets";
+import { ThemeToggle } from "@/src/components/ThemeToggle";
 import Image from "next/image";
 
 type NavLink = {
@@ -122,7 +123,8 @@ export function Navbar() {
       </nav>
 
       {/* RIGHT: Auth + hamburger */}
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex items-center justify-end gap-2 sm:gap-3">
+        <ThemeToggle />
         <div className="hidden md:flex items-center gap-3">
           {AUTH_LINKS.map((link) => (
             <Link

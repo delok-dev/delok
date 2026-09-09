@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ASSETS } from "@/src/constants/assets";
 import { ROUTES } from "@/src/constants/routes";
 import { Footer } from "@/src/components/landing/Footer";
+import { ThemeToggle } from "@/src/components/ThemeToggle";
 
 type TocItem = { id: string; label: string };
 
@@ -21,7 +22,7 @@ function LegalHeader() {
         <Link href={ROUTES.HOME} aria-label="Delok Home" className="flex items-center gap-2">
           <Image src={ASSETS.LOGO.LIGHT_TEXT} alt="Delok" width={120} height={28} className="h-7 w-auto" priority />
         </Link>
-        <nav aria-label="Legal navigation" className="flex items-center gap-1">
+        <nav aria-label="Legal navigation" className="flex items-center gap-2">
           <Link
             href={ROUTES.LEGAL.PRIVACY}
             className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -34,6 +35,7 @@ function LegalHeader() {
           >
             Terms
           </Link>
+          <ThemeToggle />
         </nav>
       </div>
     </header>

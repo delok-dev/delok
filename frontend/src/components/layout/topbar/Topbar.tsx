@@ -7,6 +7,7 @@ import { ROUTES } from "@/src/constants/routes";
 import { authClient } from "@/src/lib/auth/auth-client";
 import { OrganizationSwitcher } from "./OrganizationSwitcher";
 import { UserMenu } from "./UserMenu";
+import { ThemeToggle } from "@/src/components/ThemeToggle";
 
 type TopbarProps = {
   organizationSlug: string;
@@ -24,6 +25,7 @@ export function Topbar({ organizationSlug, organizationName }: TopbarProps) {
       />
 
       <div className="flex items-center gap-1">
+        <ThemeToggle />
         <Link
           href={ROUTES.DOCS.ROOT}
           className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"

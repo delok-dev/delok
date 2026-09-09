@@ -7,6 +7,7 @@ import { ROUTES } from "@/src/constants/routes";
 import { ASSETS } from "@/src/constants/assets";
 import { authClient } from "@/src/lib/auth/auth-client";
 import { UserMenu } from "./UserMenu";
+import { ThemeToggle } from "@/src/components/ThemeToggle";
 import Image from "next/image";
 
 export function OrganizationsTopbar() {
@@ -17,6 +18,7 @@ export function OrganizationsTopbar() {
         <Image src={ASSETS.LOGO.LIGHT_TEXT} alt="Delok Logo" width={90} height={22} />
 
       <div className="flex items-center gap-1">
+        <ThemeToggle />
         <Link
           href={ROUTES.DOCS.ROOT}
           className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
