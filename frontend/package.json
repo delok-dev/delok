@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@delok/sdk": "^0.1.6",
+    "@delok/sdk": "^0.1.7",
     "@hookform/resolvers": "^5.7.1",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-query-devtools": "^5.101.4",
@@ -33,5 +33,9 @@
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
   }
 }

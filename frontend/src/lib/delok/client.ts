@@ -11,7 +11,12 @@ function createDelokClient(): DelokClient {
 
   if (!apiKey || !apiKey.trim()) {
     const noop = () => {};
-    return { info: noop, warn: noop, error: noop, fatal: noop } as unknown as DelokClient;
+    return {
+      info: noop,
+      warn: noop,
+      error: noop,
+      fatal: noop,
+    } as unknown as DelokClient;
   }
 
   const rawEnv = process.env.NODE_ENV;
@@ -19,10 +24,20 @@ function createDelokClient(): DelokClient {
     rawEnv === "production" ? "production" : "development";
 
   try {
-    return new Delok({ apiKey: apiKey.trim(), environment });
+    const baseURL = process.env.NEXT_PUBLIC_DELOK_SDK_BASE_URL?.trim();
+    return new Delok({
+      apiKey: apiKey.trim(),
+      environment,
+      ...(baseURL ? { baseURL } : {}),
+    });
   } catch {
     const noop = () => {};
-    return { info: noop, warn: noop, error: noop, fatal: noop } as unknown as DelokClient;
+    return {
+      info: noop,
+      warn: noop,
+      error: noop,
+      fatal: noop,
+    } as unknown as DelokClient;
   }
 }
 

@@ -11,6 +11,30 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.url("BETTER_AUTH_URL must be a valid URL"),
   FRONTEND_URL: z.url("FRONTEND_URL must be a valid URL"),
   DELOK_API_KEY: z.string().min(1, "DELOK_API_KEY is required"),
+  DELOK_SDK_BASE_URL: z
+    .string()
+    .optional()
+    .transform((v) => {
+      if (v === undefined) return undefined;
+      const trimmed = v.trim();
+      return trimmed === "" ? undefined : trimmed;
+    })
+    .refine(
+      (v) =>
+        v === undefined ||
+        (() => {
+          try {
+            const u = new URL(v);
+            return u.protocol === "http:" || u.protocol === "https:";
+          } catch {
+            return false;
+          }
+        })(),
+      {
+        message: "DELOK_SDK_BASE_URL must be a valid http(s) URL",
+      },
+    )
+    .optional(),
   GOOGLE_CLIENT_ID: z.string().min(1, "GOOGLE_CLIENT_ID is required"),
   GOOGLE_CLIENT_SECRET: z.string().min(1, "GOOGLE_CLIENT_SECRET is required"),
   GITHUB_CLIENT_ID: z.string().min(1, "GITHUB_CLIENT_ID is required"),
