@@ -38,7 +38,13 @@ export function SidebarHeader({
         </button>
       ) : (
         <>
-          <Image src={ASSETS.LOGO.LIGHT_TEXT} alt="Delok" width={90} height={22} />
+          <Image
+            src={ASSETS.LOGO.LIGHT_TEXT}
+            alt="Delok"
+            width={512}
+            height={128}
+            className="w-22.5 h-auto"
+          />
 
           <button
             type="button"

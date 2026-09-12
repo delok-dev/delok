@@ -1,9 +1,10 @@
 // src/components/landing/Navbar.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
 import { ROUTES } from "@/src/constants/routes";
 import { EXTERNAL_LINKS } from "@/src/constants/external-links";
 import { ASSETS } from "@/src/constants/assets";
@@ -49,11 +50,18 @@ function GitHubIcon({ className }: { className?: string }) {
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const firstLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
+
+  // Close menu on route change (back/forward or programmatic navigation)
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -67,20 +75,54 @@ export function Navbar() {
 
   // Lock body scroll while mobile menu is open, without shifting layout
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      const scrollBarWidth =
-        window.innerWidth - document.documentElement.clientWidth;
+    if (!isMobileMenuOpen) return;
 
-      document.body.style.overflow = "hidden";
-      if (scrollBarWidth > 0) {
-        document.body.style.paddingRight = `${scrollBarWidth}px`;
-      }
+    const scrollBarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
 
-      return () => {
-        document.body.style.overflow = "";
-        document.body.style.paddingRight = "";
-      };
+    document.body.style.overflow = "hidden";
+    if (scrollBarWidth > 0) {
+      document.body.style.paddingRight = `${scrollBarWidth}px`;
     }
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
+  }, [isMobileMenuOpen]);
+
+  // Escape to close + focus trap + autofocus when open
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    // Autofocus first link for immediate keyboard operation
+    firstLinkRef.current?.focus();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsMobileMenuOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const menu = document.getElementById("mobile-menu");
+      if (!menu) return;
+      const focusable = menu.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isMobileMenuOpen]);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -142,6 +184,7 @@ export function Navbar() {
         </div>
 
         <button
+          type="button"
           className="md:hidden relative flex h-9 w-9 items-center justify-center rounded-md text-foreground hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
           onClick={() => setIsMobileMenuOpen((prev) => !prev)}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
@@ -173,100 +216,59 @@ export function Navbar() {
   const mobileMenu = mounted
     ? createPortal(
         <div
-          id="mobile-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation menu"
-          className={`fixed inset-0 z-50 flex flex-col bg-background transition-opacity duration-200 ease-out ${
-            isMobileMenuOpen
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
-          }`}
-        >
-          <div className="flex items-center justify-between p-4 border-b border-border">
-            <Link
-              href={ROUTES.HOME}
-              className="flex items-center gap-2"
-              aria-label="Delok Home"
-              onClick={closeMobileMenu}
-            >
-              <Image
-                src={ASSETS.LOGO.LIGHT_TEXT}
-                alt="Delok"
-                width={500}
-                height={120}
-                className="w-25 h-auto"
-                priority
-              />
-            </Link>
-            <button
-              onClick={closeMobileMenu}
-              className="p-2 rounded-md text-foreground hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
-              aria-label="Close menu"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <nav
-            className={`flex-1 p-4 overflow-y-auto transition-all duration-300 ease-out ${
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
+            aria-hidden={!isMobileMenuOpen}
+            // @ts-expect-error inert is valid in React 19 but not yet in TS lib
+            inert={!isMobileMenuOpen ? "" : undefined}
+            className={`fixed top-14 inset-x-0 bottom-0 z-40 flex flex-col overflow-y-auto border-t border-border bg-background transition-all duration-200 ease-out md:hidden ${
               isMobileMenuOpen
-                ? "translate-y-0 opacity-100"
-                : "-translate-y-2 opacity-0"
+                ? "translate-y-0 opacity-100 pointer-events-auto"
+                : "-translate-y-2 opacity-0 pointer-events-none"
             }`}
-            aria-label="Mobile navigation"
           >
-            <ul className="space-y-1">
-              {NAV_LINKS.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    target={link.external ? "_blank" : undefined}
-                    rel={link.external ? "noopener noreferrer" : undefined}
-                    className="block px-3 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-surface-hover rounded-md transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                    onClick={closeMobileMenu}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      {link.label}
-                      {link.external && <GitHubIcon className="h-4 w-4" />}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-              <li className="pt-4 border-t border-border">
-                <div className="flex flex-col gap-2">
-                  {AUTH_LINKS.map((link) => (
+            <nav className="p-4" aria-label="Mobile navigation">
+              <ul className="space-y-1">
+                {NAV_LINKS.map((link, idx) => (
+                  <li key={link.label}>
                     <Link
-                      key={link.label}
+                      ref={idx === 0 ? firstLinkRef : undefined}
                       href={link.href}
-                      className={`inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-                        link.variant === "primary"
-                          ? "bg-primary text-primary-foreground hover:opacity-90 px-4 py-3 text-base"
-                          : "text-foreground hover:bg-surface-hover px-4 py-3 text-base border border-border"
-                      }`}
+                      target={link.external ? "_blank" : undefined}
+                      rel={link.external ? "noopener noreferrer" : undefined}
+                      className="block px-3 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-surface-hover rounded-md transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       onClick={closeMobileMenu}
                     >
-                      {link.label}
+                      <span className="flex items-center gap-1.5">
+                        {link.label}
+                        {link.external && <GitHubIcon className="h-4 w-4" />}
+                      </span>
                     </Link>
-                  ))}
-                </div>
-              </li>
-            </ul>
-          </nav>
-        </div>,
+                  </li>
+                ))}
+                <li className="pt-4 border-t border-border">
+                  <div className="flex flex-col gap-2">
+                    {AUTH_LINKS.map((link) => (
+                      <Link
+                        key={link.label}
+                        href={link.href}
+                        className={`inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                          link.variant === "primary"
+                            ? "bg-primary text-primary-foreground hover:opacity-90 px-4 py-3 text-base"
+                            : "text-foreground hover:bg-surface-hover px-4 py-3 text-base border border-border"
+                        }`}
+                        onClick={closeMobileMenu}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </li>
+              </ul>
+            </nav>
+          </div>,
         document.body,
       )
     : null;

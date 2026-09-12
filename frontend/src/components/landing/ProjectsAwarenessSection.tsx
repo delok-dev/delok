@@ -71,7 +71,14 @@ function PreviewSidebar() {
     <div className="flex w-43 shrink-0 flex-col bg-surface">
       {/* Header — real Delok mark + collapse icon (PanelLeftClose as in SidebarHeader) */}
       <div className="flex items-center justify-between px-3 py-4">
-        <Image src={ASSETS.LOGO.LIGHT_TEXT} alt="Delok" width={90} height={22} priority />
+        <Image
+          src={ASSETS.LOGO.LIGHT_TEXT}
+          alt="Delok"
+          width={512}
+          height={128}
+          className="w-22.5 h-auto"
+          priority
+        />
         <span
           aria-hidden
           className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground"
