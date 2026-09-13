@@ -193,18 +193,22 @@ export function Navbar() {
         >
           <span className="relative block h-4 w-5">
             <span
-              className={`absolute left-0 top-0 h-0.5 w-5 bg-current transition-all duration-300 ${
-                isMobileMenuOpen ? "top-1.75 rotate-45" : ""
+              className={`absolute left-0 h-0.5 w-5 bg-current transition-all duration-300 ${
+                isMobileMenuOpen
+                  ? "top-1/2 -translate-y-1/2 rotate-45"
+                  : "top-0"
               }`}
             />
             <span
-              className={`absolute left-0 top-1.75 h-0.5 w-5 bg-current transition-opacity duration-200 ${
+              className={`absolute left-0 top-1/2 h-0.5 w-5 -translate-y-1/2 bg-current transition-opacity duration-200 ${
                 isMobileMenuOpen ? "opacity-0" : "opacity-100"
               }`}
             />
             <span
-              className={`absolute left-0 top-3.5 h-0.5 w-5 bg-current transition-all duration-300 ${
-                isMobileMenuOpen ? "top-1.75 -rotate-45" : ""
+              className={`absolute left-0 h-0.5 w-5 bg-current transition-all duration-300 ${
+                isMobileMenuOpen
+                  ? "top-1/2 -translate-y-1/2 -rotate-45"
+                  : "top-3.5"
               }`}
             />
           </span>
