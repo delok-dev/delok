@@ -1,4 +1,4 @@
-// src/components/landing/Navbar.tsx
+// src/views/home/components/Navbar.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";

@@ -1,4 +1,4 @@
-// src/components/landing/Footer.tsx
+// src/components/layout/Footer.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";

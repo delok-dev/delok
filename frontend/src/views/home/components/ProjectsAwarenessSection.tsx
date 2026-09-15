@@ -1,4 +1,4 @@
-// src/components/landing/ProjectsAwarenessSection.tsx
+// src/views/home/components/ProjectsAwarenessSection.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +16,7 @@ import Image from "next/image";
 import { ASSETS } from "@/src/constants/assets";
 
 import type { Project } from "@/src/domains/project";
-import { AWARENESS_PROJECTS } from "./delok-projects-awareness.data";
+import { AWARENESS_PROJECTS } from "../data/delok-projects-awareness.data";
 
 // --- Presentation-only rows (faithful to ProjectCard: bg-surface px-4 py-3 rounded-md) ---
 function DashboardProjectRow({ project }: { project: Project }) {

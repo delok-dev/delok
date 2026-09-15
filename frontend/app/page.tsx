@@ -1,27 +1,6 @@
 // app/page.tsx
-import {
-  Navbar,
-  Hero,
-  LogInvestigationSection,
-  ProjectsAwarenessSection,
-  FindSignalSection,
-  GetStartedSection,
-  Footer,
-} from "@/src/components/landing";
-import { HomeGate } from "@/src/components/landing/HomeGate";
+import HomePage from "@/src/views/home/HomePage";
 
-export default function HomePage() {
-  return (
-    <HomeGate>
-      <div className="min-h-screen bg-background flex flex-col">
-        <Navbar />
-        <Hero />
-        <LogInvestigationSection />
-        <ProjectsAwarenessSection />
-        <FindSignalSection />
-        <GetStartedSection />
-        <Footer />
-      </div>
-    </HomeGate>
-  );
+export default function Page() {
+  return <HomePage />;
 }

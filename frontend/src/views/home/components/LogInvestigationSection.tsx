@@ -1,4 +1,4 @@
-// src/components/landing/LogInvestigationSection.tsx
+// src/views/home/components/LogInvestigationSection.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -18,7 +18,7 @@ import {
 import {
   INVESTIGATION_LOGS,
   SELECTED_LOG_ID,
-} from "./delok-log-investigation.data";
+} from "../data/delok-log-investigation.data";
 
 function getLevelClass(level: string) {
   switch (level.toLowerCase()) {

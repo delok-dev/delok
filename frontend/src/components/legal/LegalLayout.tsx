@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ASSETS } from "@/src/constants/assets";
 import { ROUTES } from "@/src/constants/routes";
-import { Footer } from "@/src/components/landing/Footer";
+import { Footer } from "@/src/components/layout/Footer";
 import { ThemeToggle } from "@/src/components/ThemeToggle";
 
 type TocItem = { id: string; label: string };

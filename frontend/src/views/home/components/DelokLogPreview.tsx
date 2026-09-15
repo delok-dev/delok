@@ -1,11 +1,11 @@
-// src/components/landing/DelokLogPreview.tsx
+// src/views/home/components/DelokLogPreview.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import { MessageSquare, FileJson } from "lucide-react";
 import type { LogEvent } from "@/src/domains/log";
 import { formatLogDate, formatLogTime } from "@/src/domains/log";
-import { DEMO_LOGS } from "./delok-log-preview.data";
+import { DEMO_LOGS } from "../data/delok-log-preview.data";
 
 const VISIBLE_LOG_COUNT = 22;
 
@@ -190,7 +190,7 @@ export function DelokLogPreview() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 overflow-hidden sm:overflow-visible">
-      <div className="relative w-full min-w-[720px] -translate-x-[112px] sm:min-w-0 sm:w-full sm:translate-x-0 overflow-hidden rounded-lg bg-surface [overflow-anchor:none]">
+      <div className="relative w-full min-w-180 -translate-x-28 sm:min-w-0 sm:w-full sm:translate-x-0 overflow-hidden rounded-lg bg-surface [overflow-anchor:none]">
         {/* Panel header */}
         <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
           <span className="text-[10px] font-mono font-medium uppercase tracking-wider text-muted-foreground">

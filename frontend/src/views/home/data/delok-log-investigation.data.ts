@@ -1,4 +1,4 @@
-// src/components/landing/delok-log-investigation.data.ts
+// src/views/home/data/delok-log-investigation.data.ts
 import type { LogEvent } from "@/src/domains/log";
 
 /**
