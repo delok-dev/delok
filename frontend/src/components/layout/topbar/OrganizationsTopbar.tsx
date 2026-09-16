@@ -18,8 +18,9 @@ export function OrganizationsTopbar() {
       <Image
         src={ASSETS.LOGO.LIGHT_TEXT}
         alt="Delok Logo"
-        width={90}
-        height={22}
+        width={512}
+        height={128}
+        className="w-22.5 h-auto"
       />
 
       <div className="flex items-center gap-1">

@@ -11,9 +11,9 @@
 </p>
 
 <p align="center">
-  <a href="https://delok.vercel.app">Website</a>
+  <a href="https://delok.site">Website</a>
   ·
-  <a href="https://delok.vercel.app/docs">Documentation</a>
+  <a href="https://delok.site/docs">Documentation</a>
   ·
   <a href="https://github.com/delok-dev/delok-sdk">SDK</a>
 </p>
@@ -39,8 +39,8 @@ npm install @delok/sdk
 
 ## Resources
 
-- [Website](https://delok.vercel.app)
-- [Documentation](https://delok.vercel.app/docs)
+- [Website](https://delok.site)
+- [Documentation](https://delok.site/docs)
 - [GitHub Discussions](https://github.com/delok-dev/delok/discussions/1)
 
 ## Contributing

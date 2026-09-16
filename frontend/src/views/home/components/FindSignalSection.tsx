@@ -1,4 +1,4 @@
-// src/components/landing/FindSignalSection.tsx
+// src/views/home/components/FindSignalSection.tsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -11,7 +11,7 @@ import {
   SIGNAL_EMPTY_FILTERS,
   SIGNAL_INJECTED_LOG,
   SIGNAL_SHOWCASE_LOGS,
-} from "./find-signal.data";
+} from "../data/find-signal.data";
 
 function getLevelClass(level: string) {
   switch (level.toLowerCase()) {

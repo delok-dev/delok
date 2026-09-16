@@ -1,4 +1,4 @@
-// src/components/landing/delok-log-preview.data.ts
+// src/views/home/data/delok-log-preview.data.ts
 import type { LogEvent } from "@/src/domains/log";
 
 export const DEMO_LOGS: LogEvent[] = [

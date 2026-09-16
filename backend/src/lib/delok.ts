@@ -6,6 +6,9 @@ function createDelok(): Pick<Delok, "info" | "warn" | "error" | "fatal"> {
     return new Delok({
       apiKey: env.DELOK_API_KEY,
       environment: env.NODE_ENV === "production" ? "production" : "development",
+      ...(env.DELOK_SDK_BASE_URL
+        ? { baseURL: env.DELOK_SDK_BASE_URL }
+        : {}),
     });
   } catch {
     // Fallback no-op client for test/misconfigured environments — never throws
