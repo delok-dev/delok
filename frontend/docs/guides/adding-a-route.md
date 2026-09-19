@@ -34,4 +34,4 @@ export default function MyNewPage() { /* ... */ }
 
 - Route groups `(auth)` and `(root)` do not affect URL — use them to share layouts.
 - Dynamic segments use `[param]` folders; access via `useParams<{param:string}>()`.
-- Docs routes live under `app/docs/` with `app/docs/layout.tsx` wrapping `DocsLayout`.
+- Docs routes live under `app/docs/` with `app/docs/layout.tsx` as a thin entry point for `src/views/docs/DocsLayout.tsx`, which wraps `DocsLayout`.

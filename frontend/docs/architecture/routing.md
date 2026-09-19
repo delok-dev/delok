@@ -5,12 +5,12 @@
 | Route | File | Type |
 |-------|------|------|
 | `/` | `app/page.tsx` | Page — marketing home wrapped in `HomeGate` |
-| `/docs` | `app/docs/page.tsx` | Page — docs index using `DocsLayout` |
-| `/docs/introduction` | `app/docs/introduction/page.tsx` | Page |
-| `/docs/quickstart` | `app/docs/quickstart/page.tsx` | Page |
-| `/docs/installation` | `app/docs/installation/page.tsx` | Page |
-| `/docs/logging` | `app/docs/logging/page.tsx` | Page |
-| `/docs/reference/log-event` | `app/docs/reference/log-event/page.tsx` | Page |
+| `/docs` | `app/docs/page.tsx` | Page — docs index using `DocsLayout` (view: `src/views/docs/DocsPage.tsx`) |
+| `/docs/introduction` | `app/docs/introduction/page.tsx` | Page (view: `src/views/docs/introduction/IntroductionPage.tsx`) |
+| `/docs/quickstart` | `app/docs/quickstart/page.tsx` | Page (view: `src/views/docs/quickstart/QuickstartPage.tsx`) |
+| `/docs/installation` | `app/docs/installation/page.tsx` | Page (view: `src/views/docs/installation/InstallationPage.tsx`) |
+| `/docs/logging` | `app/docs/logging/page.tsx` | Page (view: `src/views/docs/logging/LoggingPage.tsx`) |
+| `/docs/reference/log-event` | `app/docs/reference/log-event/page.tsx` | Page (view: `src/views/docs/reference/log-event/LogEventPage.tsx`) |
 | `/sign-in` | `app/(auth)/sign-in/page.tsx` | Page — route group `(auth)`, OAuth-only sign-in |
 | `/auth/error` | `app/(auth)/auth/error/page.tsx` | Page |
 | `/orgs` | `app/(root)/orgs/page.tsx` | Page — org list, layout `app/(root)/orgs/layout.tsx` |
@@ -23,14 +23,14 @@
 Special files:
 - `app/layout.tsx` — root layout (fonts `Space_Grotesk`, `JetBrains_Mono`, `AppProvider`, `Toaster`)
 - `app/not-found.tsx` — global 404
-- `app/docs/layout.tsx` — docs segment layout wrapping `DocsLayout`
+- `app/docs/layout.tsx` — docs segment layout, thin entry point for `src/views/docs/DocsLayout.tsx` wrapping `DocsLayout`
 
 ## Layout Hierarchy
 
 ```
 app/layout.tsx (RootLayout)
  ├─ app/page.tsx (Home - no org layout)
- ├─ app/docs/layout.tsx (DocsLayout -> DocsNavbar + DocsSidebar)
+ ├─ app/docs/layout.tsx (view DocsLayout -> DocsLayout component -> DocsNavbar + DocsSidebar)
  ├─ app/(auth)/* (AuthLayout via views/auth)
  └─ app/(root)/orgs/layout.tsx (OrganizationsLayout)
      └─ app/(root)/orgs/[organizationSlug]/layout.tsx (OrganizationLayout -> Sidebar + Topbar)

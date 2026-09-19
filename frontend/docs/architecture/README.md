@@ -37,6 +37,7 @@ src/
   hooks/                  # useCooldown
   utils/                  # api-error, format-date
   views/                  # page-level view components (consumed by app/)
+    auth/ docs/ home/ orgs/
 public/                   # static assets
 next.config.ts            # NextConfig
 eslint.config.mjs         # next/core-web-vitals + next/typescript
