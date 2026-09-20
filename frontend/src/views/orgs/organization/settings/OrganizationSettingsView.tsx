@@ -11,7 +11,6 @@ import {
   useOrganization,
 } from "@/src/domains/organization";
 
-import { delok } from "@/src/lib/delok/client";
 import { ROUTES } from "@/src/constants/routes";
 import { formatDateTime } from "@/src/utils/format-date";
 
@@ -37,12 +36,10 @@ export function OrganizationSettingsView({
   const handleUpdate = async (name: string) => {
     try {
       const updated = await updateOrganization.mutateAsync({ name });
-      delok.info({ event: "organization.updated", message: `Organization renamed: ${updated.name}`, payload: { organizationSlug, newSlug: updated.slug } });
       if (updated.slug && updated.slug !== organizationSlug) {
         router.replace(ROUTES.ORGANIZATION.PROJECTS(updated.slug));
       }
     } catch (error) {
-      delok.error({ event: "organization.update_failed", message: "Failed to update organization", payload: { organizationSlug, error: error instanceof Error ? error.message : String(error) } });
       throw error;
     }
   };
@@ -50,11 +47,9 @@ export function OrganizationSettingsView({
   const handleDelete = async () => {
     try {
       await deleteOrganization.mutateAsync();
-      delok.info({ event: "organization.deleted", message: `Organization deleted: ${organizationSlug}`, payload: { organizationSlug } });
       showToast({ message: "Organization deleted", type: "success" });
       router.replace(ROUTES.ORGANIZATION.ROOT);
     } catch (error) {
-      delok.error({ event: "organization.delete_failed", message: "Failed to delete organization", payload: { organizationSlug, error: error instanceof Error ? error.message : String(error) } });
       throw error;
     }
   };

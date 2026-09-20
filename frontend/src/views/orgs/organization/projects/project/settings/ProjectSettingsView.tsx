@@ -12,7 +12,6 @@ import {
 import { ApiKeyList, useProjectApiKeys } from "@/src/domains/api-key";
 
 import type { Project } from "@/src/domains/project";
-import { delok } from "@/src/lib/delok/client";
 import { ROUTES } from "@/src/constants/routes";
 import { formatDateTime } from "@/src/utils/format-date";
 
@@ -39,10 +38,8 @@ export function ProjectSettingsView({
   const handleDeleteProject = async () => {
     try {
       await deleteProject();
-      delok.info({ event: "project.deleted", message: `Project deleted: ${project.name}`, payload: { projectId, organizationSlug } });
       router.replace(ROUTES.ORGANIZATION.PROJECTS(organizationSlug));
     } catch (error) {
-      delok.error({ event: "project.delete_failed", message: "Failed to delete project", payload: { projectId, organizationSlug, error: error instanceof Error ? error.message : String(error) } });
       throw error;
     }
   };

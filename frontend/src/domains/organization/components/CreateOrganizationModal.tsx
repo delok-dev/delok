@@ -9,7 +9,6 @@ import Input from "@/src/components/ui/Input";
 import Modal from "@/src/components/ui/Modal";
 import { showToast } from "@/src/components/ui/toast";
 import { useCooldown } from "@/src/hooks/useCooldown";
-import { delok } from "@/src/lib/delok/client";
 
 import { organizationSchema } from "../schemas/organization.schema";
 import { useOrganizations } from "../hooks/useOrganizations";
@@ -66,8 +65,6 @@ export function CreateOrganizationModal({
     try {
       const org = await createOrganization.mutateAsync(result.data);
 
-      delok.info({ event: "organization.created", message: `Organization created: ${org.name}`, payload: { organizationSlug: org.slug, organizationId: org.id } });
-
       showToast({ message: "Organization created", type: "success" });
 
       startCooldown();
@@ -75,7 +72,6 @@ export function CreateOrganizationModal({
       setOrganizationName("");
       setOpen(false);
     } catch (error) {
-      delok.error({ event: "organization.create_failed", message: "Failed to create organization", payload: { error: error instanceof Error ? error.message : String(error) } });
       setError(
         error instanceof Error
           ? error.message

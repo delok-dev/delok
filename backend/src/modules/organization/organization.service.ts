@@ -19,14 +19,14 @@ import {
  */
 export const createOrganizationService = async (
   name: string,
-  userId: string,
+  user: { id: string; name: string },
 ) => {
   const slug = generateSlug(name);
-  const organization = await createOrganization(name, slug, userId);
+  const organization = await createOrganization(name, slug, user.id);
   delok.info({
     event: "organization.created",
-    message: `Organization created: ${organization.name}`,
-    payload: { organizationId: organization.id, slug: organization.slug, userId },
+    message: `Organization created: ${organization.name} by ${user.name}`,
+    payload: { organizationId: organization.id, slug: organization.slug, userId: user.id, username: user.name },
   });
   return organization;
 };
@@ -60,15 +60,15 @@ export const getOrganizationBySlugService = async (
 export const updateOrganizationService = async (
   slug: string,
   name: string,
-  userId: string,
+  user: { id: string; name: string },
 ) => {
-  await ensureOrganizationOwner(slug, userId);
+  await ensureOrganizationOwner(slug, user.id);
   const newSlug = generateSlug(name);
   const organization = await updateOrganization(slug, newSlug, name);
   delok.info({
     event: "organization.updated",
-    message: `Organization updated: ${organization.name}`,
-    payload: { organizationId: organization.id, slug: organization.slug, userId },
+    message: `Organization updated: ${organization.name} by ${user.name}`,
+    payload: { organizationId: organization.id, slug: organization.slug, userId: user.id, username: user.name },
   });
   return organization;
 };
@@ -81,15 +81,15 @@ export const updateOrganizationService = async (
  */
 export const deleteOrganizationService = async (
   slug: string,
-  userId: string,
+  user: { id: string; name: string },
 ) => {
-  await ensureOrganizationOwner(slug, userId);
+  await ensureOrganizationOwner(slug, user.id);
 
   const organization = await deleteOrganization(slug);
   delok.info({
     event: "organization.deleted",
-    message: `Organization deleted: ${organization.name}`,
-    payload: { organizationId: organization.id, slug: organization.slug, userId },
+    message: `Organization deleted: ${organization.name} by ${user.name}`,
+    payload: { organizationId: organization.id, slug: organization.slug, userId: user.id, username: user.name },
   });
   return organization;
 };

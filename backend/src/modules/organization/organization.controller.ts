@@ -19,9 +19,9 @@ export const createOrganizationController = async (
   res: Response,
 ) => {
   const name = req.body.name;
-  const userId = req.session.user.id;
+  const user = req.session.user;
 
-  const data = await createOrganizationService(name, userId);
+  const data = await createOrganizationService(name, user);
 
   res.status(201).json({
     success: true,
@@ -75,10 +75,10 @@ export const updateOrganizationController = async (
   res: Response,
 ) => {
   const slug = String(req.params.slug);
-  const userId = req.session.user.id;
+  const user = req.session.user;
   const name = req.body.name;
 
-  const data = await updateOrganizationService(slug, name, userId);
+  const data = await updateOrganizationService(slug, name, user);
 
   res.json({
     success: true,
@@ -95,9 +95,9 @@ export const deleteOrganizationController = async (
   res: Response,
 ) => {
   const slug = String(req.params.slug);
-  const userId = req.session.user.id;
+  const user = req.session.user;
 
-  const data = await deleteOrganizationService(slug, userId);
+  const data = await deleteOrganizationService(slug, user);
 
   res.json({
     success: true,

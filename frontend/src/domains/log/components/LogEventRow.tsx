@@ -46,7 +46,7 @@ function isDangerLevel(level: string) {
 // perfect alignment; only its color changes.
 function getRowTintClass(level: string, isSelected: boolean) {
   if (isSelected) {
-    return `border border-white ${level === "fatal" ? "bg-danger/10" : ""}`;
+    return `border border-foreground ${level === "fatal" ? "bg-danger/10" : ""}`;
   }
 
   if (level.toLowerCase() === "fatal") {

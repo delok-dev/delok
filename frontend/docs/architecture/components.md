@@ -36,7 +36,7 @@ Mounted only inside `src/views/orgs/organization/OrganizationLayout.tsx` (org sh
 
 ## Docs (`src/components/docs/`)
 
-Docs-only: `DocsLayout`, `DocsNavbar`, `DocsSidebar`, `DocsSearch`, `DocsHomeSearch`, `Callout`, `CodeBlock`, `navigation.ts`. Used only under `app/docs/`.
+Docs-only: `DocsLayout`, `DocsNavbar`, `DocsSidebar`, `DocsSearch`, `DocsHomeSearch`, `Callout`, `CodeBlock`, `navigation.ts`. Page composition lives in `src/views/docs/`; these components are consumed by those views under `app/docs/` routes.
 
 ## Styling Conventions
 

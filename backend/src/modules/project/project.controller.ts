@@ -15,11 +15,11 @@ import {
  * Create a new project inside organization.
  */
 export const createProjectController = async (req: Request, res: Response) => {
-  const userId = req.session.user.id;
+  const user = req.session.user;
   const { name } = req.body;
   const organizationSlug = String(req.params.organizationSlug);
 
-  const data = await createProjectService(name, userId, organizationSlug);
+  const data = await createProjectService(name, user, organizationSlug);
   res.status(201).json({
     success: true,
     data,
@@ -67,13 +67,13 @@ export const getProjectByIdController = async (req: Request, res: Response) => {
 export const updateProjectController = async (req: Request, res: Response) => {
   const organizationSlug = String(req.params.organizationSlug);
   const projectId = String(req.params.projectId);
-  const userId = req.session.user.id;
+  const user = req.session.user;
   const name = req.body.name;
 
   const data = await updateProjectService(
     organizationSlug,
     projectId,
-    userId,
+    user,
     name,
   );
   res.json({
@@ -90,9 +90,9 @@ export const updateProjectController = async (req: Request, res: Response) => {
 export const deleteProjectController = async (req: Request, res: Response) => {
   const organizationSlug = String(req.params.organizationSlug);
   const projectId = String(req.params.projectId);
-  const userId = req.session.user.id;
+  const user = req.session.user;
 
-  const data = await deleteProjectService(organizationSlug, projectId, userId);
+  const data = await deleteProjectService(organizationSlug, projectId, user);
   res.json({
     success: true,
     data,

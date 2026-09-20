@@ -13,7 +13,6 @@ import {
   useProjects,
   useProjectsRealtime,
 } from "@/src/domains/project";
-import { delok } from "@/src/lib/delok/client";
 import { clearLastProjectId } from "@/src/constants/storage";
 
 const SORT_OPTIONS = [
@@ -65,7 +64,7 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     if (isError) {
-      delok.error({ event: "projects.load_failed", message: "Failed to load projects", payload: { organizationSlug } });
+      console.error("Failed to load projects", { organizationSlug });
     }
   }, [isError, organizationSlug]);
 
