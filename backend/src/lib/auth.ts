@@ -28,10 +28,11 @@ export const auth = betterAuth({
     session: {
       create: {
         after: async (session) => {
+          const user = await prisma.user.findUnique({ where: { id: session.userId } });
           delok.info({
-            event: "auth.sign_in",
-            message: `User signed in: ${session.userId}`,
-            payload: { userId: session.userId },
+            event: "auth.login",
+            message: `User signed in: ${user?.name || session.userId}`,
+            payload: { userId: session.userId, username: user?.name },
           });
         },
       },

@@ -9,7 +9,6 @@ import Input from "@/src/components/ui/Input";
 import Modal from "@/src/components/ui/Modal";
 import { showToast } from "@/src/components/ui/toast";
 import { useCooldown } from "@/src/hooks/useCooldown";
-import { delok } from "@/src/lib/delok/client";
 
 import { projectSchema } from "../schemas/project.schema";
 import { useProjects } from "../hooks/useProjects";
@@ -62,8 +61,6 @@ export function CreateProjectModal({
     try {
       const project = await createProject.mutateAsync(result.data);
 
-      delok.info({ event: "project.created", message: `Project created: ${project.name}`, payload: { projectId: project.id, organizationSlug } });
-
       showToast({ message: "Project created", type: "success" });
 
       startCooldown();
@@ -71,7 +68,6 @@ export function CreateProjectModal({
       setProjectName("");
       setOpen(false);
     } catch (error) {
-      delok.error({ event: "project.create_failed", message: "Failed to create project", payload: { organizationSlug, error: error instanceof Error ? error.message : String(error) } });
       setError(
         error instanceof Error
           ? error.message

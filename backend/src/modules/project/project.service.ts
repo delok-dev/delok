@@ -20,20 +20,21 @@ import { ensureProjectInOrganization } from "./project.authorization.js";
  */
 export const createProjectService = async (
   name: string,
-  userId: string,
+  user: { id: string; name: string },
   organizationSlug: string,
 ) => {
-  const organization = await ensureOrganizationOwner(organizationSlug, userId);
+  const organization = await ensureOrganizationOwner(organizationSlug, user.id);
 
   const project = await createProject(name, organization.organizationId);
   delok.info({
     event: "project.created",
-    message: `Project created: ${project.name}`,
+    message: `Project created: ${project.name} by ${user.name}`,
     payload: {
       projectId: project.id,
       organizationId: organization.organizationId,
       organizationSlug,
-      userId,
+      userId: user.id,
+      username: user.name,
     },
   });
   return project;
@@ -83,18 +84,18 @@ export const getProjectByIdService = async (
 export const updateProjectService = async (
   organizationSlug: string,
   projectId: string,
-  userId: string,
+  user: { id: string; name: string },
   name: string,
 ) => {
-  const member = await ensureOrganizationOwner(organizationSlug, userId);
+  const member = await ensureOrganizationOwner(organizationSlug, user.id);
 
   await ensureProjectInOrganization(projectId, member.organizationId);
 
   const project = await updateProject(projectId, name);
   delok.info({
     event: "project.updated",
-    message: `Project updated: ${project.name}`,
-    payload: { projectId: project.id, organizationId: member.organizationId, userId },
+    message: `Project updated: ${project.name} by ${user.name}`,
+    payload: { projectId: project.id, organizationId: member.organizationId, userId: user.id, username: user.name },
   });
   return project;
 };
@@ -110,17 +111,17 @@ export const updateProjectService = async (
 export const deleteProjectService = async (
   organizationSlug: string,
   projectId: string,
-  userId: string,
+  user: { id: string; name: string },
 ) => {
-  const member = await ensureOrganizationOwner(organizationSlug, userId);
+  const member = await ensureOrganizationOwner(organizationSlug, user.id);
 
   await ensureProjectInOrganization(projectId, member.organizationId);
 
   const project = await deleteProject(projectId);
   delok.info({
     event: "project.deleted",
-    message: `Project deleted: ${project.name}`,
-    payload: { projectId: project.id, organizationId: member.organizationId, userId },
+    message: `Project deleted: ${project.name} by ${user.name}`,
+    payload: { projectId: project.id, organizationId: member.organizationId, userId: user.id, username: user.name },
   });
   return project;
 };
