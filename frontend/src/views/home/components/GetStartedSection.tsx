@@ -138,20 +138,26 @@ export function GetStartedSection() {
           hasEntered ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="absolute inset-y-0 right-0 w-[44%] opacity-10 sm:w-[38%] lg:w-[30%]">
-          <video
-            src={ASSETS.VIDEO.TWO}
-            autoPlay
-            muted
-            loop
-            playsInline
-            aria-hidden
-            className="h-full w-full object-cover object-right"
-          />
-          <div className="absolute inset-0 bg-linear-to-l from-transparent via-background/35 to-background" />
+        {/* Video is constrained to the centered max-width container so it
+            stays behind the section text at any viewport width / zoom level.
+            Previously right-0 was relative to the full-bleed section and
+            drifted outside the container on very wide viewports. */}
+        <div className="absolute inset-0 mx-auto w-full max-w-7xl">
+          <div className="absolute inset-y-0 right-0 w-[44%] opacity-10 sm:w-[38%] lg:w-[30%]">
+            <video
+              src={ASSETS.VIDEO.TWO}
+              autoPlay
+              muted
+              loop
+              playsInline
+              aria-hidden
+              className="h-full w-full object-cover object-right"
+            />
+            <div className="absolute inset-0 bg-linear-to-l from-transparent via-background/35 to-background" />
+          </div>
         </div>
 
-        {/* Vertical dissolve into the page background */}
+        {/* Vertical dissolve into the page background — full-bleed */}
         <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-background to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-background to-transparent" />
       </div>
