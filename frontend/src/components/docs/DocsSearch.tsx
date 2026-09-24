@@ -87,17 +87,22 @@ export function DocsSearchModal({
 
   useEffect(() => {
     if (open) {
-      setSelected(0);
-      // Focus after mount
-      const t = setTimeout(() => inputRef.current?.focus(), 0);
+      const t = setTimeout(() => {
+        setSelected(0);
+        inputRef.current?.focus();
+      }, 0);
       return () => clearTimeout(t);
     }
     // Reset query when closing? Keep for next open, but spec shows initial state with useful destinations, so clear
-    if (!open) setQuery("");
+    if (!open) {
+      const t = setTimeout(() => setQuery(""), 0);
+      return () => clearTimeout(t);
+    }
   }, [open]);
 
   useEffect(() => {
-    setSelected(0);
+    const t = setTimeout(() => setSelected(0), 0);
+    return () => clearTimeout(t);
   }, [query]);
 
   useEffect(() => {

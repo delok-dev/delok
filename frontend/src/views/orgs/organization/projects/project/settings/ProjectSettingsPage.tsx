@@ -13,14 +13,14 @@ import ProjectSettingsLoading from "./ProjectSettingsLoading";
 import { ProjectSettingsView } from "./ProjectSettingsView";
 
 export default function ProjectSettingsPage() {
-  const { organizationSlug, projectId } = useParams<{
+  const { organizationSlug, projectSlug } = useParams<{
     organizationSlug: string;
-    projectId: string;
+    projectSlug: string;
   }>();
 
   const { project, isLoading, isError } = useProject(
     organizationSlug,
-    projectId,
+    projectSlug,
   );
 
   if (isLoading) {
@@ -45,7 +45,7 @@ export default function ProjectSettingsPage() {
         <div className="w-full max-w-4xl px-4 pt-4 pb-3 sm:px-6 sm:pt-5 sm:pb-4">
           <ProjectBreadcrumb
             organizationSlug={organizationSlug}
-            projectId={projectId}
+            projectSlug={project.slug}
             projectName={project.name}
             settings
           />
@@ -54,7 +54,7 @@ export default function ProjectSettingsPage() {
 
       <ProjectSettingsView
         organizationSlug={organizationSlug}
-        projectId={projectId}
+        projectId={project.id}
         project={project}
       />
     </div>

@@ -1,14 +1,35 @@
 // /src/modules/project/project.repository.ts
 
 import { prisma } from "../../lib/prisma.js";
+import { generateProjectSlug, regenerateProjectSlugPrefix } from "../../utils/project-slug.js";
 
 /**
  * Create project and generate its first API key.
  */
 export const createProject = async (name: string, organizationId: string) => {
+  const slug = generateProjectSlug(name);
   return prisma.project.create({
     data: {
       name,
+      slug,
+      organizationId,
+    },
+  });
+};
+
+/**
+ * Find project by slug within an organization.
+ *
+ * Encodes the organization boundary directly in the query so callers never
+ * retrieve a project that belongs to a different organization.
+ */
+export const findProjectBySlugAndOrganization = async (
+  projectSlug: string,
+  organizationId: string,
+) => {
+  return prisma.project.findFirst({
+    where: {
+      slug: projectSlug,
       organizationId,
     },
   });
@@ -91,8 +112,9 @@ export const findProjectById = async (id: string) => {
     },
     select: {
       id: true,
-      organizationId: true,
       name: true,
+      slug: true,
+      organizationId: true,
       organization: {
         select: {
           name: true,
@@ -107,14 +129,28 @@ export const findProjectById = async (id: string) => {
 /**
  * Update project by id.
  *
+ * Regenerates slug prefix from new name while keeping suffix stable.
  */
 export const updateProject = async (id: string, name: string) => {
+  const existingProject = await prisma.project.findUnique({
+    where: { id },
+    select: { slug: true },
+  });
+
+  if (!existingProject) {
+    return prisma.project.update({
+      where: { id },
+      data: { name },
+    });
+  }
+
+  const newSlug = regenerateProjectSlugPrefix(name, existingProject.slug);
+
   return prisma.project.update({
-    where: {
-      id,
-    },
+    where: { id },
     data: {
       name,
+      slug: newSlug,
     },
   });
 };

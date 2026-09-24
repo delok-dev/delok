@@ -8,14 +8,14 @@ import { ROUTES } from "@/src/constants/routes";
 
 type ProjectBreadcrumbProps = {
   organizationSlug: string;
-  projectId: string;
+  projectSlug: string;
   projectName: string;
   settings?: boolean;
 };
 
 export function ProjectBreadcrumb({
   organizationSlug,
-  projectId,
+  projectSlug,
   projectName,
   settings = false,
 }: ProjectBreadcrumbProps) {
@@ -31,7 +31,7 @@ export function ProjectBreadcrumb({
       <ChevronRight className="h-3 w-3 text-muted-foreground" />
 
       <Link
-        href={ROUTES.ORGANIZATION.PROJECT(organizationSlug, projectId)}
+        href={ROUTES.ORGANIZATION.PROJECT(organizationSlug, projectSlug)}
         className={
           settings
             ? "text-muted-foreground hover:text-foreground"
