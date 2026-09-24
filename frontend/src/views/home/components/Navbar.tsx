@@ -60,7 +60,10 @@ export function Navbar() {
 
   // Close menu on route change (back/forward or programmatic navigation)
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    const timer = setTimeout(() => {
+      setIsMobileMenuOpen(false);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   useEffect(() => {

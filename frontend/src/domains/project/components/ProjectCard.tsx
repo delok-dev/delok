@@ -43,7 +43,7 @@ export function ProjectCard({ project, organizationSlug }: ProjectCardProps) {
 
   return (
     <Link
-      href={ROUTES.ORGANIZATION.PROJECT(organizationSlug, project.id)}
+      href={ROUTES.ORGANIZATION.PROJECT(organizationSlug, project.slug)}
       className="
         group
         flex

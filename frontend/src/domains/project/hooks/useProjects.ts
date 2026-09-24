@@ -33,8 +33,8 @@ export function useProjects(organizationSlug: string | undefined) {
   });
 
   const updateProject = useMutation({
-    mutationFn: (input: { projectId: string } & UpdateProjectInput) =>
-      ProjectService.update(organizationSlug!, input.projectId, {
+    mutationFn: (input: { projectSlug: string } & UpdateProjectInput) =>
+      ProjectService.update(organizationSlug!, input.projectSlug, {
         name: input.name,
       }),
 
@@ -43,7 +43,7 @@ export function useProjects(organizationSlug: string | undefined) {
       // invalidate the project list so the breadcrumb/header and list reflect
       // the rename without a full page refresh.
       queryClient.setQueryData(
-        ["project", organizationSlug, project.id],
+        ["project", organizationSlug, project.slug],
         project,
       );
       queryClient.invalidateQueries({ queryKey: projectsKey });
@@ -51,8 +51,8 @@ export function useProjects(organizationSlug: string | undefined) {
   });
 
   const deleteProject = useMutation({
-    mutationFn: (projectId: string) =>
-      ProjectService.delete(organizationSlug!, projectId),
+    mutationFn: (projectSlug: string) =>
+      ProjectService.delete(organizationSlug!, projectSlug),
 
     onSuccess: () => {
       queryClient.invalidateQueries({

@@ -91,7 +91,10 @@ export function useLogExplorer({ projectId }: UseLogExplorerOptions) {
   // Clamp page when totalPages shrinks (filter change, deletion, realtime, limit change)
   useEffect(() => {
     const totalPages = getTotalPages(pagination.totalPages);
-    setPageState((prev) => Math.min(Math.max(prev, 1), totalPages));
+    const timer = setTimeout(() => {
+      setPageState((prev) => Math.min(Math.max(prev, 1), totalPages));
+    }, 0);
+    return () => clearTimeout(timer);
   }, [pagination.totalPages, getTotalPages]);
 
   const setFilter = useCallback((key: keyof LogFiltersState, value: string) => {

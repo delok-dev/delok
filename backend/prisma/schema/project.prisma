@@ -2,6 +2,7 @@
 model Project {
   id             String       @id @default(cuid())
   name           String
+  slug           String
   organizationId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
@@ -11,6 +12,7 @@ model Project {
   apiKeys   ApiKey[]
   logEvents LogEvent[]
 
+  @@unique([organizationId, slug])
   @@map("project")
 }
 

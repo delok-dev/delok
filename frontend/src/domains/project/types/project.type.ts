@@ -2,6 +2,7 @@
 export type Project = {
   id: string;
   name: string;
+  slug: string;
   organizationId: string;
   logCount?: number;
   createdAt?: string;

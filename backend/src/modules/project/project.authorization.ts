@@ -1,11 +1,15 @@
 // /src/modules/project/project.authorization.ts
 
 import { AppError } from "../../utils/AppError.js";
-import { ensureOrganizationOwner } from "../organization/organization.authorization.js";
+import {
+  ensureOrganizationMember,
+  ensureOrganizationOwner,
+} from "../organization/organization.authorization.js";
 import {
   findProjectById,
   findProjectByIdAndOrganization,
   findProjectByIdForMember,
+  findProjectBySlugAndOrganization,
 } from "./project.repository.js";
 
 /**
@@ -18,6 +22,33 @@ import {
  */
 export const ensureProjectMember = async (id: string, userId: string) => {
   const project = await findProjectByIdForMember(id, userId);
+
+  if (!project) {
+    throw new AppError("Forbidden", 403);
+  }
+
+  return project;
+};
+
+/**
+ * Ensure current user can access project by slug.
+ *
+ * Throws:
+ * - 403 Forbidden
+ *
+ * Returns authorized project.
+ */
+export const ensureProjectMemberBySlug = async (
+  organizationSlug: string,
+  projectSlug: string,
+  userId: string,
+) => {
+  const organization = await ensureOrganizationMember(organizationSlug, userId);
+
+  const project = await findProjectBySlugAndOrganization(
+    projectSlug,
+    organization.id,
+  );
 
   if (!project) {
     throw new AppError("Forbidden", 403);

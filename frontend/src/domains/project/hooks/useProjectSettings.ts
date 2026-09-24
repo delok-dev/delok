@@ -20,16 +20,16 @@ import { useProjects } from "./useProjects";
  */
 export function useProjectSettings(
   organizationSlug: string,
-  projectId: string,
+  projectSlug: string,
 ) {
   const { updateProject, deleteProject } = useProjects(organizationSlug);
 
   const renameProject = async (name: string) => {
-    await updateProject.mutateAsync({ projectId, name });
+    await updateProject.mutateAsync({ projectSlug, name });
   };
 
   const deleteProjectOnly = async () => {
-    await deleteProject.mutateAsync(projectId);
+    await deleteProject.mutateAsync(projectSlug);
 
     showToast({ message: "Project deleted", type: "success" });
   };

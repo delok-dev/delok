@@ -30,7 +30,7 @@ export function ProjectSettingsView({
 
   const { renameProject, deleteProject } = useProjectSettings(
     organizationSlug,
-    projectId,
+    project.slug,
   );
 
   // Navigation after deletion is a screen-level decision: the domain only

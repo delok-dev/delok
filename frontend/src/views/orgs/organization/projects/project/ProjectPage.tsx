@@ -16,27 +16,37 @@ import Link from "next/link";
 import { setLastProjectId } from "@/src/constants/storage";
 
 export default function ProjectPage() {
-  const { organizationSlug, projectId } = useParams<{
+  const { organizationSlug, projectSlug } = useParams<{
     organizationSlug: string;
-    projectId: string;
+    projectSlug: string;
   }>();
 
   const {
     project,
     isLoading: loadingProject,
     isError,
-  } = useProject(organizationSlug, projectId);
+  } = useProject(organizationSlug, projectSlug);
 
+  console.log("ProjectPage", {
+    organizationSlug,
+    projectSlug,
+    project,
+    loadingProject,
+    isError,
+  });
   useEffect(() => {
     if (isError) {
-      console.error("Failed to load project", { organizationSlug, projectId });
+      console.error("Failed to load project", {
+        organizationSlug,
+        projectSlug,
+      });
     }
     if (loadingProject || isError || !project) {
       return;
     }
 
-    setLastProjectId(organizationSlug, projectId);
-  }, [isError, loadingProject, organizationSlug, project, projectId]);
+    setLastProjectId(organizationSlug, project.id);
+  }, [isError, loadingProject, organizationSlug, project, projectSlug]);
 
   if (loadingProject) {
     return (
@@ -67,7 +77,7 @@ export default function ProjectPage() {
     <div className="flex h-full flex-col">
       <ProjectHeader
         organizationSlug={organizationSlug}
-        projectId={project.id}
+        projectSlug={project.slug}
         projectName={project.name}
       />
 

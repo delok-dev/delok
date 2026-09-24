@@ -1,5 +1,6 @@
 // /src/modules/project/project.service.ts
 
+import { AppError } from "../../utils/AppError.js";
 import { delok } from "../../lib/delok.js";
 import {
   ensureOrganizationMember,
@@ -9,6 +10,7 @@ import {
   createProject,
   deleteProject,
   findAllProjects,
+  findProjectBySlugAndOrganization,
   updateProject,
 } from "./project.repository.js";
 import { ensureProjectInOrganization } from "./project.authorization.js";
@@ -71,6 +73,37 @@ export const getProjectByIdService = async (
   const organization = await ensureOrganizationMember(organizationSlug, userId);
 
   return ensureProjectInOrganization(projectId, organization.id);
+};
+
+/**
+ * Get project by slug inside an organization.
+ *
+ * User must:
+ * - be a member of the organization in the URL.
+ *
+ * The project must belong to that organization, otherwise the request is
+ * rejected with non-leaking 404 semantics.
+ */
+export const getProjectBySlugService = async (
+  organizationSlug: string,
+  projectSlug: string,
+  userId: string,
+) => {
+  const organization = await ensureOrganizationMember(organizationSlug, userId);
+
+  const project = await findProjectBySlugAndOrganization(
+    projectSlug,
+    organization.id,
+  );
+
+  if (!project) {
+    throw new AppError("Project not found", 404, "project.not_found", {
+      projectSlug,
+      organizationSlug,
+    });
+  }
+
+  return project;
 };
 
 /**
