@@ -27,13 +27,6 @@ export default function ProjectPage() {
     isError,
   } = useProject(organizationSlug, projectSlug);
 
-  console.log("ProjectPage", {
-    organizationSlug,
-    projectSlug,
-    project,
-    loadingProject,
-    isError,
-  });
   useEffect(() => {
     if (isError) {
       console.error("Failed to load project", {
@@ -81,7 +74,11 @@ export default function ProjectPage() {
         projectName={project.name}
       />
 
-      <LogExplorer organizationSlug={organizationSlug} projectId={project.id} />
+      <LogExplorer
+        organizationSlug={organizationSlug}
+        projectId={project.id}
+        projectSlug={project.slug}
+      />
     </div>
   );
 }

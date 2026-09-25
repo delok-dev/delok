@@ -32,8 +32,9 @@ export function SidebarNavigationItem({
         event.preventDefault();
 
         try {
-          await ProjectService.getById(organizationSlug, projectId);
-          router.push(ROUTES.ORGANIZATION.PROJECT(organizationSlug, projectId));
+          // Resolve project by ID to get the current slug
+          const project = await ProjectService.getById(organizationSlug, projectId);
+          router.push(ROUTES.ORGANIZATION.PROJECT(organizationSlug, project.slug));
         } catch {
           clearLastProjectId(organizationSlug);
           router.push(href);

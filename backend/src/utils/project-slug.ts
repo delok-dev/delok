@@ -44,11 +44,3 @@ export function regenerateProjectSlugPrefix(name: string, existingSlug: string):
   const suffix = parts[parts.length - 1];
   return `${prefix}-${suffix}`;
 }
-
-/**
- * Extract the suffix from an existing project slug.
- */
-export function extractProjectSlugSuffix(slug: string): string {
-  const parts = slug.split("-");
-  return parts[parts.length - 1];
-}
