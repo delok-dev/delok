@@ -22,6 +22,19 @@ const getErrorInfo = (error: unknown) => {
           };
         }
 
+        // Project's unique constraint on (organizationId, slug).
+        if (
+          modelName === "Project" &&
+          Array.isArray(target) &&
+          target.some((t: string) => t.includes("organizationId_slug"))
+        ) {
+          return {
+            statusCode: 409,
+            errorCode: "PROJECT_SLUG_ALREADY_EXISTS",
+            message: "Project slug already exists in this organization",
+          };
+        }
+
         // Project's case-insensitive unique constraint on
         // (organizationId, lower(name)).
         if (
