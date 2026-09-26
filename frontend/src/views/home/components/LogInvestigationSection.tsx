@@ -15,25 +15,11 @@ import {
   formatLogTime,
   formatLogTimestamp,
 } from "@/src/domains/log";
+import { LogLevelBadge, LogDetailItem } from "@/src/domains/log/components";
 import {
   INVESTIGATION_LOGS,
   SELECTED_LOG_ID,
 } from "../data/delok-log-investigation.data";
-
-function getLevelClass(level: string) {
-  switch (level.toLowerCase()) {
-    case "error":
-      return "text-danger";
-    case "fatal":
-      return "text-danger font-bold";
-    case "warn":
-      return "text-yellow-500";
-    case "debug":
-      return "text-muted-foreground";
-    default:
-      return "text-primary";
-  }
-}
 
 // Mirrors LogEventRow tinting: fatal keeps a red wash, the selected row gets
 // a white highlight border, everything else stays transparent.
@@ -73,11 +59,7 @@ function StreamRow({
         {formatLogTime(log.occurredAt)}
       </span>
 
-      <span
-        className={`w-12 shrink-0 text-[10px] font-semibold uppercase ${getLevelClass(log.level)}`}
-      >
-        {log.level}
-      </span>
+      <LogLevelBadge level={log.level} />
 
       <span className="min-w-0 flex-1 truncate text-[11px] text-foreground">
         {log.event}
@@ -93,23 +75,6 @@ function StreamRow({
       {isSelected && (
         <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       )}
-    </div>
-  );
-}
-
-function DetailItem({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-        {label}
-      </p>
-      <p className="text-[11px] text-foreground wrap-break-word">{children}</p>
     </div>
   );
 }
@@ -142,12 +107,12 @@ function DetailPanel({ log }: { log: LogEvent }) {
       {/* Content */}
       <div className="p-4 space-y-5">
         <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-          <DetailItem label="Event">{log.event}</DetailItem>
-          <DetailItem label="Level">{log.level}</DetailItem>
-          <DetailItem label="Environment">{log.environment}</DetailItem>
-          <DetailItem label="Occurred At">
+          <LogDetailItem label="Event">{log.event}</LogDetailItem>
+          <LogDetailItem label="Level">{log.level}</LogDetailItem>
+          <LogDetailItem label="Environment">{log.environment}</LogDetailItem>
+          <LogDetailItem label="Occurred At">
             {formatLogTimestamp(log.occurredAt)}
-          </DetailItem>
+          </LogDetailItem>
         </div>
 
         {log.message && (

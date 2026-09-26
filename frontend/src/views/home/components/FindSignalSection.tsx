@@ -4,29 +4,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { LogEvent, LogFiltersState } from "@/src/domains/log";
-import { LogFilters } from "@/src/domains/log-explorer";
+import { LogLevelBadge, LogDetailItem } from "@/src/domains/log";
 import { matchesLogFilters } from "@/src/domains/log-explorer/utils/matchesLogFilters";
+
+import { LogFilterPreview } from "./LogFilterPreview";
 
 import {
   SIGNAL_EMPTY_FILTERS,
   SIGNAL_INJECTED_LOG,
   SIGNAL_SHOWCASE_LOGS,
 } from "../data/find-signal.data";
-
-function getLevelClass(level: string) {
-  switch (level.toLowerCase()) {
-    case "error":
-      return "text-danger";
-    case "fatal":
-      return "text-danger font-bold";
-    case "warn":
-      return "text-yellow-500";
-    case "debug":
-      return "text-muted-foreground";
-    default:
-      return "text-primary";
-  }
-}
 
 function getRowTintClass(log: LogEvent, pulseDanger: boolean = false) {
   if (log.level.toLowerCase() === "fatal") {
@@ -94,11 +81,7 @@ function ShowcaseRow({
         <div
           className={`flex items-center gap-3 border-b border-border/50 px-3 py-1.5 ${getRowTintClass(log, pulseDanger)}`}
         >
-          <span
-            className={`w-14 shrink-0 text-[10px] font-semibold uppercase ${getLevelClass(log.level)}`}
-          >
-            {log.level}
-          </span>
+          <LogLevelBadge level={log.level} />
           <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-foreground">
             {log.event}
           </span>
@@ -187,6 +170,7 @@ export function FindSignalSection() {
     );
     observer.observe(section);
 
+    // Fallback: already on screen at mount (large viewport / observer timing)
     const rect = section.getBoundingClientRect();
     if (rect.top < window.innerHeight && rect.bottom > 0) {
       observer.disconnect();
@@ -306,10 +290,10 @@ export function FindSignalSection() {
     () =>
       Boolean(
         filters.search.trim() ||
-        filters.level ||
-        filters.environment ||
-        filters.from ||
-        filters.to,
+          filters.level ||
+          filters.environment ||
+          filters.from ||
+          filters.to,
       ),
     [filters],
   );
@@ -351,9 +335,9 @@ export function FindSignalSection() {
           }`}
         >
           <div className="@container overflow-hidden rounded-lg border border-border bg-surface">
-            {/* Filter toolbar — real LogFilters component */}
+            {/* Filter toolbar — view-owned LogFilterPreview */}
             <div className="border-b border-border pt-3">
-              <LogFilters
+              <LogFilterPreview
                 search={filters.search}
                 level={filters.level}
                 environment={filters.environment}

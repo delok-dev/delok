@@ -4,9 +4,9 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
+import Skeleton from "@/src/components/ui/Skeleton";
 import type { Organization } from "../types/organization.type";
 import { OrganizationList } from "./OrganizationList";
-import { OrganizationListSkeleton } from "./OrganizationListSkeleton";
 import { OrganizationEmptyState } from "./OrganizationEmptyState";
 
 type OrganizationsPanelProps = {
@@ -56,7 +56,13 @@ export function OrganizationsPanel({
           )}
         </div>
 
-        {isLoading && <OrganizationListSkeleton />}
+        {isLoading && (
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="h-12" />
+            ))}
+          </div>
+        )}
 
         {!isLoading && organizations.length === 0 && <OrganizationEmptyState />}
 

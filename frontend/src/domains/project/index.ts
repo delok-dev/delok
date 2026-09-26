@@ -8,7 +8,6 @@ export {
   ProjectCard,
   ProjectEmptyState,
   ProjectList,
-  ProjectListSkeleton,
 } from "./components";
 
 export { ProjectService } from "./api/project.service";

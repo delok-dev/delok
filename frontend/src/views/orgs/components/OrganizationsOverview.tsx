@@ -1,8 +1,6 @@
 // src/views/orgs/components/OrganizationsOverview.tsx
-import {
-  GetStartedSection,
-  OrganizationsPanel,
-} from "@/src/domains/organization";
+import { CreateOrganizationPrompt } from "@/src/views/orgs/components/CreateOrganizationPrompt";
+import { OrganizationsPanel } from "@/src/domains/organization/components/OrganizationsPanel";
 
 import type { Organization } from "@/src/domains/organization";
 
@@ -17,7 +15,7 @@ export default function OrganizationsOverview({
 }: OrganizationsOverviewProps) {
   return (
     <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,320px)_1fr]">
-      <GetStartedSection />
+      <CreateOrganizationPrompt />
 
       <OrganizationsPanel organizations={organizations} isLoading={isLoading} />
     </section>

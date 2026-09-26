@@ -1,5 +1,5 @@
 // src/domains/log/index.ts
-export { LogDetailPanel, LogEventRow } from "./components";
+export { LogDetailPanel, LogEventRow, LogLevelBadge, LogDetailItem } from "./components";
 
 export { LogService } from "./api/log.service";
 
