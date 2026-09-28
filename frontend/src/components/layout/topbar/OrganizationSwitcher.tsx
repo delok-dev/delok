@@ -3,8 +3,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
-import { useOrganizations } from "@/src/domains/organization";
+import { useRouter } from "next/navigation";
+import { ChevronDown, Plus } from "lucide-react";
+import {
+  CreateOrganizationModal,
+  useOrganizations,
+} from "@/src/domains/organization";
 import { ROUTES } from "@/src/constants/routes";
 
 type OrganizationSwitcherProps = {
@@ -16,6 +20,7 @@ export function OrganizationSwitcher({
   organizationSlug,
   organizationName,
 }: OrganizationSwitcherProps) {
+  const router = useRouter();
   const { organizations } = useOrganizations();
   const [open, setOpen] = useState(false);
 
@@ -23,9 +28,14 @@ export function OrganizationSwitcher({
     (org) => org.slug === organizationSlug,
   );
 
-  const handleSwitch = (targetSlug: string) => {
+  const handleClose = () => {
     setOpen(false);
-    void targetSlug;
+  };
+
+  const handleCreated = (slug: string) => {
+    setOpen(false);
+
+    router.push(ROUTES.ORGANIZATION.PROJECTS(slug));
   };
 
   return (
@@ -62,7 +72,7 @@ export function OrganizationSwitcher({
                   <Link
                     key={org.id}
                     href={ROUTES.ORGANIZATION.PROJECTS(org.slug)}
-                    onClick={() => handleSwitch(org.slug)}
+                    onClick={handleClose}
                     className={`flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors ${
                       isCurrent
                         ? "bg-primary/10 text-primary font-medium"
@@ -76,6 +86,28 @@ export function OrganizationSwitcher({
                   </Link>
                 );
               })}
+            </div>
+
+            <div className="mt-1.5 border-t border-border pt-1.5">
+              {/* The dropdown stays mounted while the modal is open, otherwise
+                  the modal (rendered by this subtree) would unmount with it. */}
+              <CreateOrganizationModal
+                onCreated={(organization) =>
+                  handleCreated(organization.slug)
+                }
+                trigger={(openModal) => (
+                  <button
+                    type="button"
+                    onClick={openModal}
+                    className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-hover cursor-pointer"
+                  >
+                    <span className="flex h-5 w-5 items-center justify-center rounded bg-surface-hover text-muted-foreground">
+                      <Plus className="h-3 w-3" />
+                    </span>
+                    <span>Create organization</span>
+                  </button>
+                )}
+              />
             </div>
           </div>
         </>
