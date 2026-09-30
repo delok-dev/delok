@@ -44,10 +44,10 @@ export function OrganizationSwitcher({
         onClick={() => setOpen((prev) => !prev)}
         className="flex items-center gap-2 text-sm font-medium text-foreground hover:bg-surface-hover px-2.5 py-1.5 rounded-md transition-colors cursor-pointer"
       >
-        <span className="flex items-center justify-center h-6 w-6 rounded-md bg-primary/10 text-primary text-[11px] font-semibold">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary text-[11px] font-semibold">
           {organizationName.charAt(0).toUpperCase()}
         </span>
-        <span className="max-w-45 truncate">
+        <span className="min-w-0 max-w-45 truncate">
           {currentOrganization?.name ?? organizationName}
         </span>
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
@@ -79,10 +79,10 @@ export function OrganizationSwitcher({
                         : "text-foreground hover:bg-surface-hover"
                     }`}
                   >
-                    <span className="flex items-center justify-center h-5 w-5 rounded bg-surface-hover text-[10px] font-semibold text-muted-foreground">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-surface-hover text-[10px] font-semibold text-muted-foreground">
                       {org.name.charAt(0).toUpperCase()}
                     </span>
-                    <span className="truncate">{org.name}</span>
+                    <span className="min-w-0 truncate">{org.name}</span>
                   </Link>
                 );
               })}
