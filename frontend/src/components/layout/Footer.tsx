@@ -25,9 +25,12 @@ function GitHubIcon({ className }: { className?: string }) {
 
 const FOOTER_NAV_LINKS = [
   { label: "Documentation", href: EXTERNAL_LINKS.DOCS, external: false },
-  { label: "Privacy", href: "/privacy", external: false },
-  { label: "Terms", href: "/terms", external: false },
   { label: "GitHub", href: EXTERNAL_LINKS.GITHUB, external: true },
+] as const;
+
+const FOOTER_LEGAL_LINKS = [
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
 ] as const;
 
 export function Footer() {
@@ -105,13 +108,29 @@ export function Footer() {
         </div>
 
         {/* Bottom row */}
-        <div className="mt-16 border-t border-border/50  pt-6 sm:mt-20 flex justify-between items-center ">
+        <div className="mt-16 grid grid-cols-1 items-center gap-4 border-t border-border/50 pt-6 sm:mt-20 sm:grid-cols-3">
           <p className="text-xs text-muted-foreground">© 2026 Delok</p>
+
+          <nav aria-label="Legal" className="sm:justify-self-center">
+            <ul className="flex items-center gap-6">
+              {FOOTER_LEGAL_LINKS.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="rounded-md text-xs font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
           <a
             href={EXTERNAL_LINKS.DEVELOPER}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-md text-sm font-medium text-foreground transition-colors duration-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex items-center gap-1 self-start rounded-md text-sm font-medium text-foreground transition-colors duration-200 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:justify-self-end"
           >
             Meet the developer
             <ArrowUpRight className="h-4 w-4" />
