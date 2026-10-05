@@ -1,10 +1,10 @@
 // src/views/home/HomePage.tsx
-import { Navbar } from "./components/Navbar";
+import { Navbar } from "@/src/components/layout/navigation/Navbar";
 import { Hero } from "./components/Hero";
 import { LogInvestigationSection } from "./components/LogInvestigationSection";
 import { ProjectsAwarenessSection } from "./components/ProjectsAwarenessSection";
 import { FindSignalSection } from "./components/FindSignalSection";
-import { GetStartedSection } from "./components/GetStartedSection";
+import { InstallCtaSection } from "./components/InstallCtaSection";
 import { Footer } from "@/src/components/layout/Footer";
 import { HomeGate } from "./components/HomeGate";
 
@@ -17,7 +17,7 @@ export function HomePage() {
         <LogInvestigationSection />
         <ProjectsAwarenessSection />
         <FindSignalSection />
-        <GetStartedSection />
+        <InstallCtaSection />
         <Footer />
       </div>
     </HomeGate>

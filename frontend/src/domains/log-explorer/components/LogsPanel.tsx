@@ -238,7 +238,7 @@ export function LogsPanel({ data, actions, settingsUrl }: LogsPanelProps) {
                 <EmptyState
                   bare
                   icon={<KeyRound className="h-6 w-6" />}
-                  title={hasActiveFilters ? "No matching logs" : "No logs yet"}
+                  title={hasActiveFilters ? "No matching logs" : "No logs sent"}
                   description={
                     hasActiveFilters
                       ? "Try adjusting or clearing your filters."
@@ -315,8 +315,14 @@ export function LogsPanel({ data, actions, settingsUrl }: LogsPanelProps) {
 
                 <button
                   type="button"
-                  disabled={isLoading || page >= Math.max(pagination.totalPages, 1)}
-                  onClick={() => onPageChange(Math.min(page + 1, Math.max(pagination.totalPages, 1)))}
+                  disabled={
+                    isLoading || page >= Math.max(pagination.totalPages, 1)
+                  }
+                  onClick={() =>
+                    onPageChange(
+                      Math.min(page + 1, Math.max(pagination.totalPages, 1)),
+                    )
+                  }
                   className="rounded-md p-1.5 hover:bg-surface-hover disabled:opacity-30"
                 >
                   <ChevronRight className="h-3.5 w-3.5" />

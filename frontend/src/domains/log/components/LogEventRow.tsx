@@ -6,6 +6,7 @@ import { ChevronRight, FileJson, MessageSquare } from "lucide-react";
 
 import type { LogEvent } from "../types/log.type";
 import { formatLogDate, formatLogTime } from "../utils/format";
+import { LogLevelBadge } from "./LogLevelBadge";
 
 type LogEventRowProps = {
   log: LogEvent;
@@ -13,27 +14,6 @@ type LogEventRowProps = {
 
   isSelected?: boolean;
 };
-
-function getLevelClass(level: string) {
-  switch (level.toLowerCase()) {
-    case "error":
-      return "text-danger";
-
-    // Fatal is the highest severity - bold red text on top of the red row
-    // tint so it reads louder than a plain error.
-    case "fatal":
-      return "text-danger font-bold";
-
-    case "warn":
-      return "text-yellow-500";
-
-    case "debug":
-      return "text-muted-foreground";
-
-    default:
-      return "text-primary";
-  }
-}
 
 function isDangerLevel(level: string) {
   return level.toLowerCase() === "error" || level.toLowerCase() === "fatal";
@@ -128,13 +108,7 @@ export function LogEventRow({
         {formatLogTime(log.occurredAt)}
       </span>
 
-      <span
-        className={`w-14 shrink-0 text-[10px] font-semibold uppercase ${getLevelClass(
-          log.level,
-        )}`}
-      >
-        {log.level}
-      </span>
+      <LogLevelBadge level={log.level} />
 
       <span className="w-36 shrink-0 truncate text-[10px] font-mono text-muted-foreground">
         {log.environment}

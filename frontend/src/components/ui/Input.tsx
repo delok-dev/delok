@@ -3,6 +3,7 @@
 
 import { forwardRef, InputHTMLAttributes, useState } from "react";
 import clsx from "clsx";
+import { Eye, EyeOff } from "lucide-react";
 
 type InputProps = {
   label?: string;
@@ -73,36 +74,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               aria-pressed={showPassword}
             >
               {showPassword ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <EyeOff
                   className="h-4 w-4"
                   aria-hidden="true"
-                >
-                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7" />
-                  <path d="M9.88 9.88a3 3 0 0 0 4.24 4.24" />
-                  <path d="M20 20 4 4" />
-                </svg>
+                />
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <Eye
                   className="h-4 w-4"
                   aria-hidden="true"
-                >
-                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
+                />
               )}
             </button>
           )}

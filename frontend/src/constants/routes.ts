@@ -17,11 +17,11 @@ export const ROUTES = {
     PROJECTS: (organizationSlug: string) =>
       `/orgs/${organizationSlug}/projects`,
 
-    PROJECT: (organizationSlug: string, projectId: string) =>
-      `/orgs/${organizationSlug}/projects/${projectId}`,
+    PROJECT: (organizationSlug: string, projectSlug: string) =>
+      `/orgs/${organizationSlug}/projects/${projectSlug}`,
 
-    PROJECT_SETTINGS: (organizationSlug: string, projectId: string) =>
-      `/orgs/${organizationSlug}/projects/${projectId}/settings`,
+    PROJECT_SETTINGS: (organizationSlug: string, projectSlug: string) =>
+      `/orgs/${organizationSlug}/projects/${projectSlug}/settings`,
   },
 
   DOCS: {

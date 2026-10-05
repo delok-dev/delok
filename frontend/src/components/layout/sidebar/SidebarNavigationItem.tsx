@@ -11,6 +11,8 @@ type SidebarNavigationItemProps = {
   organizationSlug: string;
   pathname: string;
   collapsed: boolean;
+  /** Called after a navigation link is activated (used to close the mobile drawer). */
+  onNavigate?: () => void;
 };
 
 export function SidebarNavigationItem({
@@ -18,6 +20,7 @@ export function SidebarNavigationItem({
   organizationSlug,
   pathname,
   collapsed,
+  onNavigate,
 }: SidebarNavigationItemProps) {
   const router = useRouter();
   const active = item.isActive(pathname, organizationSlug);
@@ -25,6 +28,8 @@ export function SidebarNavigationItem({
   const Icon = item.icon;
 
   const handleClick = async (event: React.MouseEvent<HTMLAnchorElement>) => {
+    onNavigate?.();
+
     if (item.label === "Projects") {
       const projectId = getLastProjectId(organizationSlug);
 
@@ -32,8 +37,9 @@ export function SidebarNavigationItem({
         event.preventDefault();
 
         try {
-          await ProjectService.getById(organizationSlug, projectId);
-          router.push(ROUTES.ORGANIZATION.PROJECT(organizationSlug, projectId));
+          // Resolve project by ID to get the current slug
+          const project = await ProjectService.getById(organizationSlug, projectId);
+          router.push(ROUTES.ORGANIZATION.PROJECT(organizationSlug, project.slug));
         } catch {
           clearLastProjectId(organizationSlug);
           router.push(href);

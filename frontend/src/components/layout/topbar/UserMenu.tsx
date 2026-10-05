@@ -39,12 +39,10 @@ export function UserMenu({ userName, userEmail }: UserMenuProps) {
     <div className="relative">
       <button
         onClick={() => setOpen((prev) => !prev)}
+        aria-label="Open account menu"
         className="flex items-center gap-2 hover:bg-surface-hover px-2 py-1.5 rounded-md transition-colors cursor-pointer"
       >
         <UserAvatar name={userName} />
-        <span className="hidden sm:block text-xs font-medium text-foreground max-w-30 truncate">
-          {userName ?? "User"}
-        </span>
       </button>
 
       {open && (

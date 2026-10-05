@@ -12,6 +12,7 @@ import { useCooldown } from "@/src/hooks/useCooldown";
 
 import { organizationSchema } from "../schemas/organization.schema";
 import { useOrganizations } from "../hooks/useOrganizations";
+import type { Organization } from "../types/organization.type";
 
 type CreateOrganizationModalProps = {
   /**
@@ -19,10 +20,17 @@ type CreateOrganizationModalProps = {
    * Receives a function that opens the modal.
    */
   trigger?: (open: () => void) => React.ReactNode;
+
+  /**
+   * Called with the newly created organization, right before the modal closes.
+   * Use it to navigate to the new organization, refresh lists, etc.
+   */
+  onCreated?: (organization: Organization) => void;
 };
 
 export function CreateOrganizationModal({
   trigger,
+  onCreated,
 }: CreateOrganizationModalProps) {
   const [open, setOpen] = useState(false);
   const [organizationName, setOrganizationName] = useState("");
@@ -71,6 +79,8 @@ export function CreateOrganizationModal({
 
       setOrganizationName("");
       setOpen(false);
+
+      onCreated?.(org);
     } catch (error) {
       setError(
         error instanceof Error

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/src/lib/auth/auth-client";
 import { ROUTES } from "@/src/constants/routes";
 
-import OrganizationsLoading from "@/src/views/orgs/components/OrganizationsLoading";
+import Loader from "@/src/components/ui/Loader";
 
 export default function OrganizationsLayout({
   children,
@@ -30,7 +30,11 @@ export default function OrganizationsLayout({
     return null;
   }
   if (isPending) {
-    return <OrganizationsLoading />;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader label="Loading organizations" />
+      </div>
+    );
   }
 
   return children;

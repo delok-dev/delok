@@ -46,7 +46,7 @@ export function Sidebar({ organizationSlug }: SidebarProps) {
       style={{
         width: collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH,
       }}
-      className="bg-surface flex flex-col transition-[width] duration-200 ease-in-out"
+      className="bg-surface hidden shrink-0 flex-col transition-[width] duration-200 ease-in-out md:flex"
     >
       <SidebarHeader
         collapsed={collapsed}

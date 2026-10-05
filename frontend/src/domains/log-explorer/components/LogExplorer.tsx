@@ -10,11 +10,13 @@ import { LogsPanel } from "./LogsPanel";
 type LogExplorerProps = {
   organizationSlug: string;
   projectId: string;
+  projectSlug: string;
 };
 
 export function LogExplorer({
   organizationSlug,
   projectId,
+  projectSlug,
 }: LogExplorerProps) {
   const {
     logs,
@@ -37,7 +39,7 @@ export function LogExplorer({
   // when the project has never received a log).
   const settingsUrl = `${ROUTES.ORGANIZATION.PROJECT_SETTINGS(
     organizationSlug,
-    projectId,
+    projectSlug,
   )}#api-keys`;
 
   return (

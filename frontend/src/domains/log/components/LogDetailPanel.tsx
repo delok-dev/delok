@@ -5,6 +5,7 @@ import { FileJson, MessageSquare, X } from "lucide-react";
 
 import type { LogEvent } from "../types/log.type";
 import { formatLogTimestamp } from "../utils/format";
+import { LogDetailItem } from "./LogDetailItem";
 
 type LogDetailPanelProps = {
   log: LogEvent | null;
@@ -53,15 +54,15 @@ export function LogDetailPanel({
         <div className="space-y-5 min-w-0">
           {/* Metadata — 2x2 grid spanning the panel width */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-            <DetailItem label="Event">{log.event}</DetailItem>
+            <LogDetailItem label="Event">{log.event}</LogDetailItem>
 
-            <DetailItem label="Level">{log.level}</DetailItem>
+            <LogDetailItem label="Level">{log.level}</LogDetailItem>
 
-            <DetailItem label="Environment">{log.environment}</DetailItem>
+            <LogDetailItem label="Environment">{log.environment}</LogDetailItem>
 
-            <DetailItem label="Occurred At">
+            <LogDetailItem label="Occurred At">
               {formatLogTimestamp(log.occurredAt)}
-            </DetailItem>
+            </LogDetailItem>
           </div>
 
           {log.message && (
@@ -96,23 +97,5 @@ export function LogDetailPanel({
         </div>
       </div>
     </aside>
-  );
-}
-
-function DetailItem({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-        {label}
-      </p>
-
-      <p className="text-[11px] text-foreground wrap-break-word">{children}</p>
-    </div>
   );
 }

@@ -37,7 +37,7 @@ function normalizeProject(raw: Record<string, unknown>): Project {
  * Centralized service for all project-related API requests.
  *
  * All project operations are mounted under an organization boundary:
- * `/api/organizations/:organizationSlug/projects[/:projectId]`
+ * `/api/organizations/:organizationSlug/projects[/:projectSlug]`
  */
 export class ProjectService {
   /**
@@ -89,15 +89,15 @@ export class ProjectService {
   }
 
   /**
-   * Get a single project by id within an organization.
-   * @returns `GET /api/organizations/:organizationSlug/projects/:projectId`
+   * Get a single project by slug within an organization.
+   * @returns `GET /api/organizations/:organizationSlug/projects/:projectSlug`
    */
-  static async getById(
+  static async getBySlug(
     organizationSlug: string,
-    projectId: string,
+    projectSlug: string,
   ): Promise<Project> {
     const response = await fetch(
-      `${API_BASE_URL}/api/organizations/${organizationSlug}/projects/${projectId}`,
+      `${API_BASE_URL}/api/organizations/${organizationSlug}/projects/${projectSlug}`,
       {
         credentials: "include",
       },
@@ -114,15 +114,15 @@ export class ProjectService {
 
   /**
    * Update a project's name within an organization. Requires org OWNER role.
-   * @returns `PATCH /api/organizations/:organizationSlug/projects/:projectId`
+   * @returns `PATCH /api/organizations/:organizationSlug/projects/:projectSlug`
    */
   static async update(
     organizationSlug: string,
-    projectId: string,
+    projectSlug: string,
     input: UpdateProjectInput,
   ): Promise<Project> {
     const response = await fetch(
-      `${API_BASE_URL}/api/organizations/${organizationSlug}/projects/${projectId}`,
+      `${API_BASE_URL}/api/organizations/${organizationSlug}/projects/${projectSlug}`,
       {
         method: "PATCH",
         credentials: "include",
@@ -143,14 +143,14 @@ export class ProjectService {
   /**
    * Delete a project within an organization. Requires org OWNER role.
    * Cascades to all ApiKeys and LogEvents.
-   * @returns `DELETE /api/organizations/:organizationSlug/projects/:projectId`
+   * @returns `DELETE /api/organizations/:organizationSlug/projects/:projectSlug`
    */
   static async delete(
     organizationSlug: string,
-    projectId: string,
+    projectSlug: string,
   ): Promise<Project> {
     const response = await fetch(
-      `${API_BASE_URL}/api/organizations/${organizationSlug}/projects/${projectId}`,
+      `${API_BASE_URL}/api/organizations/${organizationSlug}/projects/${projectSlug}`,
       {
         method: "DELETE",
         credentials: "include",
@@ -164,5 +164,29 @@ export class ProjectService {
     }
 
     return data.data;
+  }
+
+  /**
+   * Get a single project by id within an organization (internal use).
+   * @returns `GET /api/organizations/:organizationSlug/projects/by-id/:projectId`
+   */
+  static async getById(
+    organizationSlug: string,
+    projectId: string,
+  ): Promise<Project> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/organizations/${organizationSlug}/projects/by-id/${projectId}`,
+      {
+        credentials: "include",
+      },
+    );
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => null);
+      throw new Error(getApiErrorMessage(data, "Failed to fetch project"));
+    }
+
+    const data = await response.json();
+    return normalizeProject(data.data);
   }
 }

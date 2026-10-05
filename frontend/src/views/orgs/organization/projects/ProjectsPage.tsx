@@ -9,10 +9,10 @@ import {
   CreateProjectModal,
   ProjectEmptyState,
   ProjectList,
-  ProjectListSkeleton,
   useProjects,
   useProjectsRealtime,
 } from "@/src/domains/project";
+import Skeleton from "@/src/components/ui/Skeleton";
 import { clearLastProjectId } from "@/src/constants/storage";
 
 const SORT_OPTIONS = [
@@ -109,7 +109,13 @@ export default function ProjectsPage() {
 
       {/* Content */}
       <section className="flex flex-1 flex-col">
-        {isLoading && <ProjectListSkeleton />}
+        {isLoading && (
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="h-12" />
+            ))}
+          </div>
+        )}
 
         {!isLoading && projects.length === 0 && (
           <div className="flex flex-1 items-center justify-center">

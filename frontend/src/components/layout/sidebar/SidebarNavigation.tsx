@@ -6,12 +6,14 @@ type SidebarNavigationProps = {
   organizationSlug: string;
   pathname: string;
   collapsed: boolean;
+  onNavigate?: () => void;
 };
 
 export function SidebarNavigation({
   organizationSlug,
   pathname,
   collapsed,
+  onNavigate,
 }: SidebarNavigationProps) {
   return (
     <nav className="flex-1 flex flex-col gap-1 px-2 py-3">
@@ -22,6 +24,7 @@ export function SidebarNavigation({
           organizationSlug={organizationSlug}
           pathname={pathname}
           collapsed={collapsed}
+          onNavigate={onNavigate}
         />
       ))}
     </nav>

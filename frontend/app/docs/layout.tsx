@@ -7,7 +7,7 @@ import DocsLayout from "@/src/views/docs/DocsLayout";
 export const metadata: Metadata = {
   title: {
     template: "%s | Delok Docs",
-    default: "Documentation | Delok",
+    default: "Documentation",
   },
   description:
     "Documentation for Delok — learn how to collect, search, and view application logs with the Delok SDK.",
