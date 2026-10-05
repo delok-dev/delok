@@ -19,7 +19,7 @@ export function ProjectHeader({
 }: ProjectHeaderProps) {
   return (
     <header className="sticky top-0 z-99 shrink-0 border-b border-border bg-background/90 backdrop-blur">
-      <div className="flex w-full items-center justify-between px-6 py-4">
+      <div className="flex w-full items-center justify-between gap-3 px-4 py-4 sm:px-6">
         <ProjectBreadcrumb
           organizationSlug={organizationSlug}
           projectSlug={projectSlug}
@@ -28,7 +28,7 @@ export function ProjectHeader({
 
         <Link
           href={ROUTES.ORGANIZATION.PROJECT_SETTINGS(organizationSlug, projectSlug)}
-          className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-surface-hover hover:text-foreground transition-colors"
+          className="flex shrink-0 items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-surface-hover hover:text-foreground transition-colors"
         >
           <Settings className="h-3.5 w-3.5" />
           Settings
