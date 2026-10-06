@@ -5,7 +5,7 @@ This document explains the purpose of every significant directory and file in th
 ## Repository Root
 
 ```
-delok-backend/
+backend/
 ├── prisma/              # Database schema and migrations
 ├── src/                 # TypeScript application source
 ├── docs/                # This documentation (generated)
@@ -28,9 +28,9 @@ prisma/
 └── migrations/          # Auto-generated migration SQL files
 ```
 
-**Why multi-file schema?** The project uses Prisma 7's multi-schema feature to split the large schema into domain-oriented files. Each `.prisma` file maps to one business domain. The root [schema.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/schema.prisma) only declares the generator and datasource.
+**Why multi-file schema?** The project uses Prisma 7's multi-schema feature to split the large schema into domain-oriented files. Each `.prisma` file maps to one business domain. The root [schema.prisma](prisma/schema/schema.prisma) only declares the generator and datasource.
 
-Configuration lives in [prisma.config.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma.config.ts), which tells Prisma the schema folder and migration path.
+Configuration lives in [prisma.config.ts](prisma.config.ts), which tells Prisma the schema folder and migration path.
 
 Generated Prisma Client is output to `src/generated/prisma/` (see `output` in schema.prisma).
 
@@ -56,9 +56,9 @@ Every file exports a single pre-configured singleton instance. Modules import th
 
 | File | Export | Purpose |
 |------|--------|---------|
-| [prisma.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/prisma.ts) | `prisma` | `PrismaClient` configured with `@prisma/adapter-pg` (PostgreSQL driver) |
-| [auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts) | `auth` | `betterAuth` instance with Prisma adapter, OAuth providers (Google, GitHub) |
-| [delok.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/delok.ts) | `delok`, `errorLogger` | Delok SDK for self-monitoring + error logger middleware function |
+| [prisma.ts](src/lib/prisma.ts) | `prisma` | `PrismaClient` configured with `@prisma/adapter-pg` (PostgreSQL driver) |
+| [auth.ts](src/lib/auth.ts) | `auth` | `betterAuth` instance with Prisma adapter, OAuth providers (Google, GitHub) |
+| [delok.ts](src/lib/delok.ts) | `delok`, `errorLogger` | Delok SDK for self-monitoring + error logger middleware function |
 
 **Design rationale**: Centralizing client construction ensures consistent configuration (timeouts, retries, auth headers) across the app. It also makes swapping implementations easy (change one file).
 
@@ -75,7 +75,7 @@ middlewares/
     └── auth-rate-limit.middleware.ts  # Path-based rate limiters for auth endpoints
 ```
 
-Middleware is mounted per-route in the `*.route.ts` files (not globally) unless it's the error middleware which is mounted last in [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts#L96).
+Middleware is mounted per-route in the `*.route.ts` files (not globally) unless it's the error middleware which is mounted last in [app.ts](src/app.ts#L96).
 
 ### `src/modules/` — Business Domain Modules
 
@@ -128,7 +128,7 @@ The realtime subsystem is separated from `modules/` because it's a cross-cutting
 
 ### `src/features/` — Shared Feature Config
 
-The `features/auth/` directory has been removed along with email/password authentication.
+The `features/auth/` directory does not exist in this project.
 
 ### `src/types/` — TypeScript Augmentations
 
@@ -145,21 +145,21 @@ Small, framework-agnostic utilities. No external SDK state here.
 
 | File | Export | Purpose |
 |------|--------|---------|
-| [AppError.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/utils/AppError.ts) | `AppError` class | Custom error with `statusCode`, `errorCode`, `message`. Used by all business logic. |
-| [async-handler.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/utils/async-handler.ts) | `asyncHandler` | Wraps async controller so thrown errors/rejected promises are forwarded to Express error middleware. |
-| [api-response.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/utils/api-response.ts) | `errorResponse` | Helper to send consistent error JSON (used by rate limiter before error middleware runs) |
-| [hash.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/utils/hash.ts) | `sha256` | Used to hash API keys before storage (plaintext is returned once only) |
+| [AppError.ts](src/utils/AppError.ts) | `AppError` class | Custom error with `statusCode`, `errorCode`, `message`. Used by all business logic. |
+| [async-handler.ts](src/utils/async-handler.ts) | `asyncHandler` | Wraps async controller so thrown errors/rejected promises are forwarded to Express error middleware. |
+| [api-response.ts](src/utils/api-response.ts) | `errorResponse` | Helper to send consistent error JSON (used by rate limiter before error middleware runs) |
+| [hash.ts](src/utils/hash.ts) | `sha256` | Used to hash API keys before storage (plaintext is returned once only) |
 
 ## Entry Points
 
-### [src/server.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/server.ts) — Process Entry
+### [src/server.ts](src/server.ts) — Process Entry
 
 1. Loads `dotenv/config` first — all env vars available
 2. Creates an HTTP `server` from the Express `app`
 3. Registers the `upgrade` event to hand off WebSocket connections to `websocket`
 4. Listens on `process.env.PORT`
 
-### [src/app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts) — Express Assembly
+### [src/app.ts](src/app.ts) — Express Assembly
 
 Order of middleware/route mounting:
 1. `cors()` — allow `localhost:3000`, credentials, `x-api-key` header

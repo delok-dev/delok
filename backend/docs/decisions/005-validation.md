@@ -18,7 +18,7 @@ Then, *where* validation runs is a separate choice:
 Delok additionally needs:
 - Strong type-safety flowing from request body into services via TypeScript
 - Query param coercion (strings → numbers/dates) since Express always gives strings
-- Passwords validated at a cross-module hook (Better Auth sign-up) not in a route
+- No password-based auth exists (OAuth only). No cross-module password hook.
 - A way to share schema types with downstream services without duplicating interfaces
 
 **Note on rationale**: Context/decision are **inferred** from the codebase. No explicit written decision record found.
@@ -35,7 +35,7 @@ Delok additionally needs:
    - A `z.object({...})` schema named `<domain>Schema` / `<action><Domain>Schema`
    - Its inferred TypeScript type: `type X = z.infer<typeof xSchema>` for reuse in services.
 4. **Query param validation: `schema.parse(req.query)` inline in controller.** For GET endpoints (currently only log-event), query schemas with `z.coerce.number()`, `z.coerce.date()`, `.default(N)` are parsed directly inside the controller with `.parse()` (not `.safeParse()`). The resulting ZodError flows through errorMiddleware.
-5. **Cross-feature shared schemas in `src/features/`.** Password complexity rules (`passwordSchema` in `features/auth/auth.schema.ts`) used by Better Auth sign-up hook live outside any single module because they're not tied to one module's endpoint.
+5. **No password-based auth exists.** Delok uses OAuth only (Google, GitHub). There is no password schema, sign-up hook, or password reset flow in the codebase.
 6. **Service-level business validation.** Where a check is a *business rule* (name < 3 chars, API key already revoked), it is enforced **again** in the service layer with `AppError`, not only in Zod. This is defense-in-depth against validation that somehow bypasses the HTTP middleware (e.g. future non-HTTP callers).
 
 ## Consequences
@@ -50,6 +50,5 @@ Delok additionally needs:
 ### Negative
 - **Two validation error formats.** Body validation failures return `{ success: false, errors: ZodIssue[] }` directly from middleware. Query param validation (via `.parse()`, not middleware) returns `{ success: false, error: { code: "UNKNOWN_ERROR", message: "Internal Server Error" } }` from the generic errorMiddleware because ZodError is classified as a regular Error. Clients need to know two shapes.
 - **No explicit path param validation.** `/:id` and `/:projectId` parameters are never validated against a Zod schema (e.g. format check for CUID/UUID). Non-existent IDs flow all the way to repository → `null` → service throws 404 or authz throws 403. Functional, but malformed IDs (short strings) hit the database with an indexed lookup rather than being rejected at the edge.
-- **Inline `.parse()` in controller (query params) leaks validation logic.** Logically query validation belongs at the same boundary as body validation; today it's done inside the controller, a different file from body validation's route boundary.
-- **Password schema only enforced in sign-up hook.** The `passwordSchema` (uppercase, lowercase, number, special, 8–128) runs in the Better Auth sign-up hook. Users who reset their password or are created via other paths do NOT have it validated against the same schema unless those flows also explicitly call it (not verified in current implementation; password reset goes through Better Auth's own internal min/max length of 8–128, but the custom regex rules are not re-applied because the hook only runs when `ctx.path === "/sign-up/email"`).
+- **Inline `.parse()` in controller (query params) leaks validation logic.** Logically query validation belongs at the same boundary as body validation; today it's done inside the controller, a different file from body validation's route boundary.
 - **No OpenAPI auto-generation** from Zod schemas today, though it is possible with tools like `@asteasolutions/zod-to-openapi` in the future.

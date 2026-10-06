@@ -107,7 +107,7 @@ Anti-pattern NOT present:
 Repository-only behaviors:
 - Build Prisma query objects
 - Return raw Prisma results (entities or null)
-- Encapsulate pagination/filter composition (e.g., [log-event.query.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/log-event/log-event.query.ts))
+- Encapsulate pagination/filter composition (e.g., [log-event.query.ts](src/modules/log-event/log-event.query.ts))
 
 ---
 

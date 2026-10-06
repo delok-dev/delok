@@ -1,8 +1,8 @@
 # API Key API
 
 API keys are mounted at **two** URL prefixes:
-- **`/api/projects/:projectId/api-keys`** — create/list keys for a project (uses [project-api-key.route.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/api-key/routes/project-api-key.route.ts))
-- **`/api/api-key/:id`** — rename/revoke an individual key (uses [api-key.route.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/api-key/routes/api-key.route.ts))
+- **`/api/projects/:projectId/api-keys`** — create/list keys for a project (uses `backend/src/modules/api-key/routes/project-api-key.route.ts`)
+- **`/api/api-key/:id`** — rename/revoke an individual key (uses `backend/src/modules/api-key/routes/api-key.route.ts`)
 
 All endpoints require session authentication (not API-key-auth — these are the *management* endpoints for keys, not the ingestion endpoint).
 
@@ -44,20 +44,20 @@ Create a new API key for a project. **The plaintext key is returned exactly once
 }
 ```
 
-⚠️ **The backend never returns `data.key` again.** Subsequent endpoints return only metadata (prefix, created date, revoked status). The UI must prompt the user to copy it immediately.
+> **The backend never returns `data.key` again.** Subsequent endpoints return only metadata (prefix, created date, revoked status). The UI must prompt the user to copy it immediately.
 
 ### Audit Log
-After creation, the service emits `delok.info` event: `api-key.created` with org ID, org name, project ID, project name as payload. The backend records its own management actions in itself.
+After creation, the service emits `delok.info` event: `api_key.created` with payload `{projectId, userId}`. The backend records its own management actions in itself.
 
 ### Service + Repository
-- Service: [api-key.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/api-key/api-key.service.ts#L27-L60)
-- Repository: [api-key.repository.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/api-key/api-key.repository.ts#L10-L21)
+- Service: `backend/src/modules/api-key/api-key.service.ts`
+- Repository: `backend/src/modules/api-key/api-key.repository.ts`
 
 ### Error Responses
 | Scenario | Status | Message |
 |----------|--------|---------|
-| Not org owner | 403 | `"Forbidden"` |
-| Project not found | 404 | `"Project not found"` (via ensureProjectManagementAccess) |
+| Not org owner | 403 | `organization.access_denied` |
+| Project not found / not accessible | 404 | `project.not_found` |
 | Name validation fails | 400 | Zod issues array |
 
 ---
@@ -95,8 +95,8 @@ Return metadata for all API keys belonging to a project. **The raw key or keyHas
 Repository `select` clause explicitly whitelists these fields; `keyHash`, `projectId`, and `createdById` are excluded. Result is ordered by `createdAt DESC` (newest first).
 
 ### Service + Repository
-- Service: [api-key.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/api-key/api-key.service.ts#L70-L77)
-- Repository: [api-key.repository.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/api-key/api-key.repository.ts#L40-L57)
+- Service: `backend/src/modules/api-key/api-key.service.ts`
+- Repository: `backend/src/modules/api-key/api-key.repository.ts`
 
 ---
 
@@ -158,7 +158,7 @@ This is a **soft delete** — the row is not removed. Repository function `revok
 data: { revokedAt: new Date() }
 ```
 
-Ingestion ([ingestion.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.service.ts#L36-L38)) checks this field on every request:
+Ingestion (`ingestion.service.ts`) checks this field on every request:
 ```typescript
 if (apiKey.revokedAt) {
   throw new AppError("API Key already revoked", 401);
@@ -181,7 +181,8 @@ if (apiKey.revokedAt) {
 
 ## Mounting in App
 
-From [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts#L67-L68):
+From `app.ts`:
+
 ```typescript
 app.use("/api/projects/:projectId/api-keys", projectApiKeyRoute);
 app.use("/api/api-key", apiKeyRoute);
@@ -190,7 +191,7 @@ app.use("/api/api-key", apiKeyRoute);
 Both routers use `{ mergeParams: true }` because `projectApiKeyRoute` needs `req.params.projectId`.
 
 ## Key Security Properties Summary
-- Plaintext key never stored (SHA-256 hashed)
+- Plaintext key never stored (SHA-256 hashed, **not HMAC** — `utils/hash.ts` uses `createHash("sha256")`)
 - KeyHash DB unique constraint
 - Revocation is permanent, checked every request
 - `lastUsedAt` throttled update (every 5+ minutes only, not every single ingestion)

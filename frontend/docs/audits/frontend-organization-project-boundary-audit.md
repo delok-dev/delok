@@ -1,5 +1,7 @@
 # Delok Frontend Audit — Organization vs. Project Boundary
 
+> **Historical document (2026-10).** This audit predates the project-slug migration. It describes the old `:projectId` architecture. Current routes use `:projectSlug`. Do not treat this as current guidance — see [routing.md](routing.md), [project.md](domains/project.md), and [log-explorer.md](domains/log-explorer.md) for the current state.
+
 Scope of inspection: all `app/**` routes, `src/views/**`, `src/domains/{organization,project,api-key,log,log-explorer}/**`, `src/components/layout/**`, `src/providers/**`, `src/lib/**` (auth, delok client, websocket), `src/constants/**`, hooks and services. Backend behavior is only referenced where the frontend explicitly constructs requests to it. No files were modified during this audit.
 
 ---

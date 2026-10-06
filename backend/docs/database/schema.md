@@ -8,19 +8,19 @@ The schema lives in `prisma/schema/`:
 
 | File | Contains |
 |------|----------|
-| [schema.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/schema.prisma) | Generator (client output: `src/generated/prisma`) and datasource declaration |
-| [auth.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/auth.prisma) | `User`, `Session`, `Account`, `Verification` (Better Auth standard models) |
-| [organization.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/organization.prisma) | `Organization`, `OrganizationMember`, enum `OrganizationRole` |
-| [project.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/project.prisma) | `Project`, `ApiKey` |
-| [log-event.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/log-event.prisma) | `LogEvent` |
+| [schema.prisma](prisma/schema/schema.prisma) | Generator (client output: `src/generated/prisma`) and datasource declaration |
+| [auth.prisma](prisma/schema/auth.prisma) | `User`, `Session`, `Account`, `Verification` (Better Auth standard models) |
+| [organization.prisma](prisma/schema/organization.prisma) | `Organization`, `OrganizationMember`, enum `OrganizationRole` |
+| [project.prisma](prisma/schema/project.prisma) | `Project`, `ApiKey` |
+| [log-event.prisma](prisma/schema/log-event.prisma) | `LogEvent` |
 
-Prisma merges all `*.prisma` files in the schema folder at generation time, via [prisma.config.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma.config.ts) (`schema: "prisma/schema"`).
+Prisma merges all `*.prisma` files in the schema folder at generation time, via [prisma.config.ts](prisma.config.ts) (`schema: "prisma/schema"`).
 
 ---
 
 ## Model: `User`
 
-**Purpose**: Represents a human user of the Delok platform. Authenticated via Better Auth (email/password, Google, or GitHub).
+| **Purpose**: Represents a human user of the Delok platform. Authenticated via Better Auth (Google OAuth or GitHub OAuth only — no email/password sign-up configured). |
 
 **Table**: `user`
 
@@ -34,7 +34,7 @@ Prisma merges all `*.prisma` files in the schema folder at generation time, via 
 | `createdAt` | DateTime | `now()` | Creation timestamp |
 | `updatedAt` | DateTime | `@updatedAt` | Last change timestamp |
 
-**Relationships** (see also [relationships.md](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/docs/database/relationships.md)):
+**Relationships** (see also [relationships.md](docs/database/relationships.md)):
 - `sessions: Session[]` — Zero or more active login sessions
 - `accounts: Account[]` — Zero or more linked auth accounts (one per provider)
 - `organizationMembers: OrganizationMember[]` — All organizations this user belongs to
@@ -151,7 +151,7 @@ enum OrganizationRole {
 }
 ```
 
-Used on `OrganizationMember.role`. See [authorization.md](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/docs/backend/authorization.md) for the permissions of each role.
+Used on `OrganizationMember.role`. See [authorization.md](docs/backend/authorization.md) for the permissions of each role.
 
 ---
 
@@ -188,9 +188,10 @@ Default role inferred from migration history: `20260711061753_added_default_role
 |-------|------|----------------------|---------|
 | `id` | String | PK, `cuid()` | CUID for public URLs |
 | `name` | String | Required | Project display name |
+| `slug` | String | Required | URL slug — `normalized-name-<12-hex-suffix>`, unique per org (`@@unique([organizationId, slug])`) |
 | `organizationId` | String | FK → Organization.id | Parent org |
 | `createdAt` | DateTime | `now()` | Creation timestamp |
-| `updatedAt` | DateTime | `@updatedAt` | Last change timestamp |
+| `updatedAt` | DateTime | `@default(now()) @updatedAt` | Last change timestamp |
 
 **Relationships**:
 - `organization: Organization` (FK: `organizationId`, `onDelete: Cascade`)
@@ -198,7 +199,8 @@ Default role inferred from migration history: `20260711061753_added_default_role
 - `logEvents: LogEvent[]` — all logs received for this project
 
 **Constraints**:
-- Case-insensitive uniqueness on `(organizationId, lower(name))` via raw index `project_organizationId_lower_name_idx` (migration `20260819120000_case_insensitive_project_name`). Two projects in the same org cannot share a name differing only by case. The constraint is enforced at the DB level (not in `project.prisma`/`project.validation.ts`); duplicate returns Prisma `P2002`.
+- Unique per organization: `@@unique([organizationId, slug])` (migration `2026092600000_add_project_slug`).
+- Case-insensitive name uniqueness via raw DB index `project_organizationId_lower_name_idx` (migration `20260819120000`) — enforced at DB level, produces `P2002` → 409 `PROJECT_NAME_ALREADY_EXISTS`. The Prisma schema does not declare this constraint; it exists only as a raw migration.
 
 ---
 

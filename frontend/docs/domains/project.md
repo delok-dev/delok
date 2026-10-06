@@ -12,7 +12,7 @@ CRUD for projects scoped to an organization. Projects own logs and API keys. Lis
 
 ```
 project/
-  api/project.service.ts        # listByOrganization, create, getById, update, delete
+  api/project.service.ts        # listByOrganization, create, getBySlug, update, delete
   components/
     ProjectCard.tsx, ProjectList.tsx, ProjectListSkeleton.tsx, ProjectEmptyState.tsx,
     ProjectHeader.tsx, ProjectBreadcrumb.tsx, ProjectSettings.tsx, ProjectDangerZone.tsx,
@@ -23,7 +23,7 @@ project/
     useProjectSettings.ts (mutations for update/delete)
     useProjectsRealtime.ts (WS project.log_count.updated -> setQueryData)
   schemas/project.schema.ts     # name trimmed 3-100
-  types/project.type.ts         # Project {id, name, organizationId, logCount?, createdAt, updatedAt}
+  types/project.type.ts         # Project {id, name, slug, organizationId, logCount?, createdAt, updatedAt}
   index.ts
 ```
 
@@ -31,9 +31,9 @@ project/
 
 - **List:** `GET /api/organizations/:slug/projects` -> `ProjectList`
 - **Create:** `POST .../projects` -> `CreateProjectModal` (OWNER role required)
-- **Get:** `GET .../projects/:projectId` -> `ProjectPage`, `ProjectHeader`, `LogExplorer`
-- **Update:** `PATCH .../projects/:projectId` -> `ProjectSettings`
-- **Delete:** `DELETE .../projects/:projectId` -> `ProjectDangerZone` (cascades to ApiKeys + LogEvents)
+- **Get:** `GET .../projects/:projectSlug` → `ProjectPage`, `ProjectHeader`, `LogExplorer`
+- **Update:** `PATCH .../projects/:projectSlug` → `ProjectSettings`
+- **Delete:** `DELETE .../projects/:projectSlug` → `ProjectDangerZone` (cascades to ApiKeys + LogEvents)
 - **Realtime:** `useProjectsRealtime` subscribes to visible `projectIds`, listens for `project.log_count.updated`, patches `["projects", slug]` cache.
 
 ## Dependencies
@@ -45,8 +45,8 @@ project/
 ## Routes using it
 
 - `/orgs/:slug/projects` -> `ProjectsPage` -> `useProjects` + `useProjectsRealtime`
-- `/orgs/:slug/projects/:projectId` -> `ProjectPage` -> `useProject` + `LogExplorer`
-- `/orgs/:slug/projects/:projectId/settings` -> `ProjectSettingsPage` -> `ProjectSettings` + `ApiKeyList` + `ProjectDangerZone`
+- `/orgs/:slug/projects/:projectSlug` → `ProjectPage` → `useProject` + `LogExplorer`
+- `/orgs/:slug/projects/:projectSlug/settings` → `ProjectSettingsPage` → `ProjectSettings` + `ApiKeyList` + `ProjectDangerZone`
 
 ## External systems
 

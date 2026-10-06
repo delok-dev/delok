@@ -12,7 +12,7 @@
 ## `src/lib/websocket/`
 
 - Purpose: Singleton `WebSocketManager` (`websocket.ts`) — single WS connection shared app-wide.
-- Public API: `connect()`, `disconnect()`, `subscribe(projectId)`, `unsubscribe(projectId)`, `on<T>(type, handler) => unsubscribe`. Types in `realtime.types.ts`: `RealtimeEvent = { "log.created": LogEvent, "project.log_count.updated": {projectId,logCount}}`.
+- Public API: `connect()`, `disconnect()`, `subscribe(projectSlug)`, `unsubscribe(projectSlug)`, `on<T>(type, handler) => unsubscribe`. Types in `realtime.types.ts`: `RealtimeEvent = { "log.created": LogEvent, "project.log_count.updated": {projectSlug,logCount}}`;
 - Internals: `attempt` + exponential backoff (`1s*2^attempt` cap 30s), `resubscribeAll` on open, `handleMessage` JSON parse + dispatch to `handlers` map. Validates `wss://` on https and in production.
 - Consumers: `SocketProvider` (lifecycle, mounted in `app/(root)/orgs/layout.tsx` — not globally), `useLogExplorerRealtime`, `useProjectsRealtime`.
 - Backend relation: Expects messages `{type, data}` and `project.subscribe/unsubscribe` protocol. URL `NEXT_PUBLIC_WS_URL`.
@@ -26,7 +26,7 @@
 | File | Export | Consumers |
 |------|--------|-----------|
 | `routes.ts` | `ROUTES` (HOME, AUTH.*, ORGANIZATION.*, DOCS.*) | Navigation, sidebar, HomeGate, AuthRoutingProvider |
-| `storage.ts` | `STORAGE_KEYS` + helpers `getLastProjectId/setLastProjectId/clearLastProjectId` | `ProjectPage`, `AuthRoutingProvider`, `HomeGate` |
+| `storage.ts` | `STORAGE_KEYS` + helpers `getLastProjectSlug/setLastProjectSlug/clearLastProjectSlug` | `ProjectPage`, `AuthRoutingProvider`, `HomeGate` |
 | `assets.ts` | `ASSETS.LOGO.*`, `VIDEO.TWO` | `not-found.tsx`, `Navbar`, `Hero` |
 | `external-links.ts` | `EXTERNAL_LINKS.DOCS/GITHUB/DEVELOPER` | `Navbar`, `Hero`, `Footer` |
 

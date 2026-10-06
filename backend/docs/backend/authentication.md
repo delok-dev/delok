@@ -4,7 +4,7 @@ Delok uses **Better Auth** (`better-auth` v1.6.23) as its authentication framewo
 
 ## Better Auth Integration
 
-Better Auth is configured in [lib/auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts) as a singleton. Key configuration (values from `lib/env.ts` validated via Zod):
+Better Auth is configured in [lib/auth.ts](src/lib/auth.ts) as a singleton. Key configuration (values from `lib/env.ts` validated via Zod):
 
 | Setting | Value | Purpose |
 |---------|-------|---------|
@@ -13,10 +13,12 @@ Better Auth is configured in [lib/auth.ts](file:///c:/Users/Yuan/OneDrive/Deskto
 | `database` | `prismaAdapter(prisma, { provider: "postgresql" })` | Store users/sessions/accounts in PostgreSQL |
 | `onAPIError.errorURL` | `` `${env.FRONTEND_URL}/auth/error` `` | Frontend redirect target for auth errors |
 | `secret` | `env.BETTER_AUTH_SECRET` | Session signing secret |
+| `advanced.defaultCookieAttributes` | `sameSite: "none"`, `secure: true`, `httpOnly: true` | Cross-origin cookie attributes for OAuth flow |
+| `databaseHooks` | `after: { signIn, oauthSignIn }` | Emits `auth.login` / `auth.oauth_sign_in` events |
 
 ### Required Environment Variables
 
-Validated at startup in [lib/env.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/env.ts) (Zod `envSchema` — fail-fast throw if any missing):
+Validated at startup in [lib/env.ts](src/lib/env.ts) (Zod `envSchema` — fail-fast throw if any missing):
 
 ```
 DATABASE_URL            # PostgreSQL connection string
@@ -27,6 +29,8 @@ GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET
 GITHUB_CLIENT_ID
 GITHUB_CLIENT_SECRET
+DELOK_API_KEY           # Required — SDK self-monitoring API key (sent on every self-log)
+DELOK_SDK_BASE_URL      # Optional — SDK base URL (defaults to Delok backend URL)
 PORT                    # optional, default 8000
 NODE_ENV                # development | production | test, default development
 ```
@@ -42,7 +46,7 @@ NODE_ENV                # development | production | test, default development
 
 ### Storage
 
-Sessions are stored in the `Session` table ([auth.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/auth.prisma)):
+Sessions are stored in the `Session` table ([auth.prisma](prisma/schema/auth.prisma)):
 
 | Field | Meaning |
 |-------|---------|
@@ -57,11 +61,11 @@ Index on `userId` for fast "get all user's sessions" queries.
 
 ### Session Resolution
 
-The [authMiddleware](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/middlewares/auth.middleware.ts) resolves sessions:
+The [authMiddleware](src/middlewares/auth.middleware.ts) resolves sessions:
 
 1. Extracts cookies from Node headers via `fromNodeHeaders(req.headers)`
 2. Calls `auth.api.getSession({ headers })` (Better Auth's server-side session resolver)
-3. If session → sets `req.session` (declared on Express via [types/express.d.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/types/express.d.ts) type augmentation)
+3. If session → sets `req.session` (declared on Express via [types/express.d.ts](src/types/express.d.ts) type augmentation)
 4. If no session → throws `AppError("unauthorized", 401)`
 
 `req.session` shape (Better Auth session type): `{ user: { id, name, email, image, createdAt, updatedAt }, ...sessionProps }`.
@@ -74,12 +78,12 @@ Not all routes are protected. The middleware is applied per-route in each module
 |--------|-------------------|-------|
 | `/api/auth/*` | Handled by Better Auth internally | Has rate limiter but no authMiddleware |
 | `/api/organization/*` | ALL (5 endpoints) | authMiddleware on every route |
-| `/api/organizations/:organizationSlug/projects` | ALL (5 endpoints) | authMiddleware on every route |
+| `/api/organizations/:organizationSlug/projects` | ALL (6 endpoints) | authMiddleware on every route; includes GET /by-id/:projectId helper |
 | `/api/projects/:projectId/logs` | ALL (1 endpoint) | authMiddleware on every route |
 | `/api/projects/:projectId/api-keys` | ALL (2 endpoints) | authMiddleware on every route |
 | `/api/api-key/*` | ALL (2 endpoints) | authMiddleware on every route |
 | `/api/user/me` | Yes | Protected (the only user endpoint) |
-| `/api/ingestion` | **NO** (not session-based) | Uses API key auth inside controller/service (see next section) |
+| `/api/ingestion` | **NO** (not session-based) | Uses API key auth inside controller/service (see next section); has `ingestionRateLimiter` (120 req/min per key-or-IP) |
 
 ## API Key Authentication (Ingestion Only)
 
@@ -102,14 +106,14 @@ flowchart LR
 ```
 
 Key security properties:
-- **Plaintext key is never stored.** Only the SHA-256 hash (`sha256` from [utils/hash.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/utils/hash.ts)) is persisted in `ApiKey.keyHash`.
+- **Plaintext key is never stored.** Only the SHA-256 hash (`sha256` from [utils/hash.ts](src/utils/hash.ts)) is persisted in `ApiKey.keyHash`.
 - **Key is returned exactly once:** from `POST /api/projects/:projectId/api-keys` 201 response. The UI is responsible for showing it to the user with a "copy this now" warning.
 - **Lookup uniqueness:** `keyHash` has `@unique` in the Prisma schema, preventing hash collision DB errors.
 - **Revocation check:** `revokedAt` timestamp is set when the user revokes; the ingestion flow checks this field on every request.
 
 ## Auth Route Mounting
 
-From [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts):
+From [app.ts](src/app.ts):
 
 ```typescript
 app.use("/api/auth", authRateLimiter);
@@ -122,7 +126,7 @@ The order is important:
 
 ## Auth Rate Limiting
 
-Auth endpoints are protected by [auth-rate-limit.middleware.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/middlewares/rate-limit/auth-rate-limit.middleware.ts) with path-specific limits:
+Auth endpoints are protected by [auth-rate-limit.middleware.ts](src/middlewares/rate-limit/auth-rate-limit.middleware.ts) with path-specific limits:
 
 | Path | Window | Limit |
 |------|--------|-------|

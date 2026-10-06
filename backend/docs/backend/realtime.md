@@ -34,7 +34,7 @@ graph TD
 
 ### `event.types.ts` — Type-Safe Event Contracts
 
-File: [event.types.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/infrastructure/realtime/event.types.ts)
+File: [event.types.ts](src/infrastructure/realtime/event.types.ts)
 
 All realtime events are declared in a single `RealtimeEventMap` interface. This creates a **discriminated union** where every event name maps to a specific payload type.
 
@@ -42,6 +42,8 @@ All realtime events are declared in a single `RealtimeEventMap` interface. This 
 export interface RealtimeEventMap {
   "log.created": LogCreatedEvent;
   "project.subscribe": { projectId: string };
+  "project.unsubscribe": { projectId: string };
+  "project.log_count.updated": { projectId: string; logCount: number };
 }
 
 export interface RealtimeEvent<TType extends RealtimeEventType = RealtimeEventType> {
@@ -59,10 +61,10 @@ Current events:
 
 ### `websocket.ts` — Connection Manager
 
-File: [websocket.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/infrastructure/realtime/websocket.ts)
+File: [websocket.ts](src/infrastructure/realtime/websocket.ts)
 
 Responsibilities:
-- Singleton `WebSocketServer` instance with `noServer: true` — the HTTP upgrade listener in [server.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/server.ts) manually routes upgrade events to it after session authentication
+- Singleton `WebSocketServer` instance with `noServer: true` — the HTTP upgrade listener in [server.ts](src/server.ts) manually routes upgrade events to it after session authentication
 - `subscriptions: Map<WebSocket, Set<string>>` — in-memory map from each client connection to the **set of project IDs** they're subscribed to. A client can subscribe to **up to 10 projects** per socket (`MAX_SUBSCRIPTIONS_PER_SOCKET = 10`).
 - `socketUsers: WeakMap<WebSocket, string>` — authenticated user ID per socket, set by the upgrade handler in `server.ts`
 - `connection` handler: logs connect/disconnect, initializes heartbeat (`isAlive` + `pong` listener)
@@ -71,11 +73,11 @@ Responsibilities:
 - Heartbeat: `setInterval` every 30s pings clients; terminates sockets that did not pong (detects stale connections)
 - Rate limiting on WS messages: not implemented; a client can send subscribe storms up to the 10-project cap
 
-**Authentication on WebSocket**: Upgrade is authenticated. [server.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/server.ts) calls `auth.api.getSession({ headers: fromNodeHeaders(request.headers) })` before `handleUpgrade`; if no session, it writes `401 Unauthorized` and destroys the socket. After upgrade, `socketUsers` stores `session.user.id` and subscription handling additionally checks `ensureProjectMember` before accepting a project ID.
+**Authentication on WebSocket**: Upgrade is authenticated. [server.ts](src/server.ts) calls `auth.api.getSession({ headers: fromNodeHeaders(request.headers) })` before `handleUpgrade`; if no session, it writes `401 Unauthorized` and destroys the socket. After upgrade, `socketUsers` stores `session.user.id` and subscription handling additionally checks `ensureProjectMember` before accepting a project ID.
 
 ### `realtime.service.ts` — Broadcast Service
 
-File: [realtime.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/infrastructure/realtime/realtime.service.ts)
+File: [realtime.service.ts](src/infrastructure/realtime/realtime.service.ts)
 
 Singleton `RealtimeService` class with a single method:
 
@@ -102,7 +104,7 @@ Broadcast logic:
 
 ### Connection: server.ts Upgrade Hook
 
-In [server.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/server.ts):
+In [server.ts](src/server.ts):
 
 ```typescript
 server.on("upgrade", async (request, socket, head) => {
@@ -122,7 +124,7 @@ Upgrade is rejected with 401 if no Better Auth session. No path-based WS routing
 
 Ingestion is the producer of realtime events.
 
-From [ingestion.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.service.ts):
+From [ingestion.service.ts](src/modules/ingestion/ingestion.service.ts):
 
 ```typescript
 const createdLog = await createLogEvent(...);

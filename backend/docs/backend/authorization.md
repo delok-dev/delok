@@ -4,7 +4,7 @@ Authorization in Delok is a **service-layer concern**, not a middleware concern.
 
 ## Role Model
 
-The project has a **two-level role hierarchy** via the `OrganizationRole` enum ([organization.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/organization.prisma#L28-L31)):
+The project has a **two-level role hierarchy** via the `OrganizationRole` enum (`prisma/schema/organization.prisma`):
 
 ```prisma
 enum OrganizationRole {
@@ -15,7 +15,7 @@ enum OrganizationRole {
 
 Roles are **per-organization**, stored in the `OrganizationMember` join table (composite PK: `[organizationId, userId]`).
 
-| Role | Capabilities (inferred from which `ensure*` is used) |
+| Role | Capabilities |
 |------|------------------------------------------------------|
 | **OWNER** | Update/delete organization; create/update/delete projects; create/list/revoke/rename API keys |
 | **MEMBER** | Read organization; list projects in org; read project details; read logs for any project in the org |
@@ -28,9 +28,9 @@ All helpers live in `*.authorization.ts` files per module.
 
 ### Organization-Level Helpers
 
-File: [organization.authorization.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.authorization.ts)
+File: `backend/src/modules/organization/organization.authorization.ts`
 
-#### `ensureOrganizationMember(organizationSlug, userId)`
+#### `ensureOrganizationMember(slug, userId)`
 
 Guarantees the user has any role (OWNER or MEMBER) in the organization.
 
@@ -39,16 +39,16 @@ flowchart LR
     A[ensureOrganizationMember] --> B[findOrganizationBySlugForMember<br/>WHERE org.slug = ? AND org.organizationMembers CONTAINS userId]
     B --> C{Row found?}
     C -- Yes --> D[Return organization entity]
-    C -- No --> E[delok.warn<br/>organization.access_denied]
+    C -- No --> E[console.warn(JSON.stringify({event: "organization.access_denied", ...}))]
     E --> F[throw AppError Forbidden 403]
 ```
 
 Used by:
 - `getOrganizationBySlugService` (read org by slug)
 - `getAllProjectsService` (list projects requires org membership)
-- `getProjectByIdService` (read a project requires membership in the URL organization)
+- `getProjectBySlugService` (read a project requires membership in the URL organization)
 
-#### `ensureOrganizationOwner(organizationId, userId)`
+#### `ensureOrganizationOwner(slug, userId)`
 
 Guarantees the user has `role = OWNER` in the organization.
 
@@ -57,7 +57,7 @@ flowchart LR
     A[ensureOrganizationOwner] --> B[findOwnerMembership<br/>WHERE orgId + userId + role=OWNER]
     B --> C{Row found?}
     C -- Yes --> D[Return membership record]
-    C -- No --> E[delok.warn<br/>User try to access owner feature]
+    C -- No --> E[console.warn(JSON.stringify({event: "organization.owner_access_denied", ...}))]
     E --> F[throw AppError Forbidden 403]
 ```
 
@@ -69,7 +69,7 @@ Used by:
 
 ### Project-Level Helpers
 
-File: [project.authorization.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/project/project.authorization.ts)
+File: `backend/src/modules/project/project.authorization.ts`
 
 #### `ensureProjectMember(projectId, userId)`
 
@@ -86,21 +86,25 @@ flowchart LR
 Used by:
 - `getLogsByProjectIdService` (read logs requires project → org membership)
 
-#### `ensureProjectInOrganization(projectId, organizationId)`
+#### `ensureProjectInOrganization(projectSlug, organizationId)`
 
 Guarantees the project exists **and** belongs to the given organization. The organization boundary is encoded directly in the query, so a project belonging to a different organization is never returned — even when the caller is a member/owner of that other organization too.
 
 ```mermaid
 flowchart LR
-    A[ensureProjectInOrganization] --> B[findProjectByIdAndOrganization<br/>WHERE project.id = ? AND project.organizationId = ?]
+    A[ensureProjectInOrganization] --> B[findProjectBySlugAndOrganization<br/>WHERE project.slug = ? AND project.organizationId = ?]
     B --> C{Row found?}
     C -- Yes --> D[Return project entity]
-    C -- No --> E[throw AppError Project not found 404<br/>non-leaking]
+    C -- No --> E[throw AppError project.not_found 404<br/>non-leaking]
 ```
 
 Used by:
-- `getProjectByIdService` (after `ensureOrganizationMember`)
+- `getProjectBySlugService` (after `ensureOrganizationMember`)
 - `updateProjectService`, `deleteProjectService` (after `ensureOrganizationOwner`)
+
+#### `ensureProjectMemberBySlug(organizationSlug, projectSlug, userId)`
+
+Primary path for GET/PATCH/DELETE project by slug. Combines org membership + project-slug lookup + ownership check in one query.
 
 #### `ensureProjectManagementAccess(projectId, userId)`
 
@@ -110,8 +114,8 @@ Guarantees the user is an **OWNER** of the parent organization. Used for any des
 flowchart LR
     A[ensureProjectManagementAccess] --> B[findProjectById → get organizationId]
     B --> C{Project exists?}
-    C -- No --> D[throw AppError Project not found 404]
-    C -- Yes --> E[ensureOrganizationOwner organizationId, userId]
+    C -- No --> D[throw AppError project.not_found 404]
+    C -- Yes --> E[ensureOrganizationOwner organizationSlug, userId]
     E --> F{Owner?}
     F -- Yes --> G[Return project entity]
     F -- No --> H[AppError Forbidden 403 via ensureOrganizationOwner]
@@ -137,23 +141,23 @@ graph TD
     subgraph "Project Operations"
         PROJ_LIST[GET /organizations/:slug/projects] --> OM
         PROJ_CREATE[POST /organizations/:slug/projects] --> OO
-        PROJ_READ[GET /organizations/:slug/projects/:id] --> OM
-        PROJ_UPDATE[PATCH /organizations/:slug/projects/:id] --> OO
-        PROJ_DELETE[DELETE /organizations/:slug/projects/:id] --> OO
+        PROJ_READ[GET /organizations/:slug/projects/:projectSlug] --> OM
+        PROJ_UPDATE[PATCH /organizations/:slug/projects/:projectSlug] --> OO
+        PROJ_DELETE[DELETE /organizations/:slug/projects/:projectSlug] --> OO
         OM --> PO[ensureProjectInOrganization<br/>org membership is NOT enough]
         OO --> PO
         PO --> PROJ_RESULT[Return project or 404]
     end
 
     subgraph "API Key Operations"
-        KEY_CREATE[POST /projects/:id/api-keys] --> PMA
-        KEY_LIST[GET /projects/:id/api-keys] --> PMA
+        KEY_CREATE[POST /projects/:projectId/api-keys] --> PMA
+        KEY_LIST[GET /projects/:projectId/api-keys] --> PMA
         KEY_RENAME[PATCH /api/api-key/:id] --> LOAD_KEY[findApiKeyById → projectId] --> PMA
         KEY_REVOKE[PATCH /api/api-key/:id/revoke] --> LOAD_KEY2[findApiKeyById → projectId] --> PMA
     end
 
     subgraph "Log Operations"
-        LOG_LIST[GET /projects/:id/logs] --> PM
+        LOG_LIST[GET /projects/:projectId/logs] --> PM
         LOG_INGEST[POST /api/ingestion] --> APIKEY["API key auth (separate path)"]
     end
 ```
@@ -188,16 +192,15 @@ Every authorization helper throws:
 AppError(message = "Forbidden", statusCode = 403)
 ```
 
-Which surfaces via error middleware as:
+Which surfaces via error middleware as one of:
 ```json
-{
-  "success": false,
-  "error": {
-    "code": "UNKNOWN_ERROR",
-    "message": "Forbidden"
-  },
-  "timestamp": "ISO-8601"
-}
+{ "success": false, "error": { "code": "organization.access_denied", "message": "..." } }
+```
+```json
+{ "success": false, "error": { "code": "organization.owner_access_denied", "message": "..." } }
+```
+```json
+{ "success": false, "error": { "code": "project.not_found", "message": "..." } }
 ```
 
-All denied accesses are also audit-logged via `delok.warn()` with a descriptive event payload (organization and user IDs).
+Authorization helpers log via `console.warn(JSON.stringify(...))` (organization authz only — project authz throws with no log).

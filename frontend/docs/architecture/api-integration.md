@@ -30,22 +30,22 @@ This pattern appears in `auth.service.ts`, `organization.service.ts`, `project.s
 | Org | GET | `/api/organization/:slug` | `organization.service.ts` |
 | Org | PATCH | `/api/organization/:slug` | `organization.service.ts` |
 | Org | DELETE | `/api/organization/:slug` | `organization.service.ts` |
-| Project | GET | `/api/organizations/:organizationSlug/projects` | `project.service.ts` |
-| Project | POST | `/api/organizations/:organizationSlug/projects` | `project.service.ts` |
-| Project | GET | `/api/organizations/:organizationSlug/projects/:projectId` | `project.service.ts` |
-| Project | PATCH | `/api/organizations/:organizationSlug/projects/:projectId` | `project.service.ts` |
-| Project | DELETE | `/api/organizations/:organizationSlug/projects/:projectId` | `project.service.ts` |
-| Log | GET | `/api/projects/:projectId/logs?page=&limit=&search=&level=&environment=&from=&to=` | `log.service.ts` |
-| API Key | GET | `/api/projects/:projectId/api-keys` | `api-key.service.ts` |
-| API Key | POST | `/api/projects/:projectId/api-keys` | `api-key.service.ts` |
-| API Key | PATCH | `/api/api-key/:id` (rename) | `api-key.service.ts` |
-| API Key | PATCH | `/api/api-key/:id/revoke` | `api-key.service.ts` |
+|| Project | GET | `/api/organizations/:organizationSlug/projects` | `project.service.ts` |
+|| Project | POST | `/api/organizations/:organizationSlug/projects` | `project.service.ts` |
+|| Project | GET | `/api/organizations/:organizationSlug/projects/:projectSlug` | `project.service.ts` |
+|| Project | PATCH | `/api/organizations/:organizationSlug/projects/:projectSlug` | `project.service.ts` |
+|| Project | DELETE | `/api/organizations/:organizationSlug/projects/:projectSlug` | `project.service.ts` |
+|| Log | GET | `/api/projects/:projectSlug/logs?page=&limit=&search=&level=&environment=&from=&to=` | `log.service.ts` |
+|| API Key | GET | `/api/projects/:projectSlug/api-keys` | `api-key.service.ts` |
+|| API Key | POST | `/api/projects/:projectSlug/api-keys` | `api-key.service.ts` |
+|| API Key | PATCH | `/api/api-key/:id` (rename) | `api-key.service.ts` |
+|| API Key | PATCH | `/api/api-key/:id/revoke` | `api-key.service.ts` |
 
 Response shape: `{ data: T }` on success; errors are `{ error:{code,message}}` or `{errors:[...]}` — see `src/utils/api-error.ts`.
 
 ## Request and Response Handling
 
-- Requests: `Content-Type: application/json` for POST/PATCH. API keys are not sent by the frontend; they are for SDK ingestion.
+- Requests: `Content-Type: application/json` for POST/PATCH. API keys are sent by the frontend via `NEXT_PUBLIC_DELOK_API_KEY` (env var for SDK self-monitoring); ingestion uses `x-api-key` header.
 - Responses: `response.json()` then `normalize*` helpers map `created_at/updated_at` -> `createdAt/updatedAt` (`organization.service.ts`, `project.service.ts`).
 - Lists: `(data.data ?? []).map(normalizeX)`.
 
@@ -62,12 +62,12 @@ Response shape: `{ data: T }` on success; errors are `{ error:{code,message}}` o
 - URL: `NEXT_PUBLIC_WS_URL` (fallback `ws://localhost:8000`), with `wss://` enforcement on https/production.
 - Connection: `SocketProvider` calls `connect()` on mount. Exponential backoff reconnect (`1s * 2^attempt`, cap 30s). Auto-resubscribes on `onopen`.
 - Protocol:
-  - Subscribe: `{type:"project.subscribe", data:{projectId}}`
-  - Unsubscribe: `{type:"project.unsubscribe", data:{projectId}}`
+  - Subscribe: `{type:"project.subscribe", data:{projectSlug}}`
+  - Unsubscribe: `{type:"project.unsubscribe", data:{projectSlug}}`
   - Events: `{type, data}` dispatched to handlers registered via `websocketManager.on(type, handler)`.
 - Event types (`src/lib/websocket/realtime.types.ts`):
   - `log.created` -> `LogEvent`
-  - `project.log_count.updated` -> `{projectId, logCount}`
+- `project.log_count.updated` -> `{projectSlug, logCount}`
 - Consumers: `useLogExplorerRealtime` (filters via `matchesLogFilters`) and `useProjectsRealtime` (updates React Query cache).
 
 ## Frontend and Backend Responsibilities

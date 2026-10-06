@@ -166,7 +166,7 @@ new AppError(message: string, statusCode: number, errorCode?: string);
 
 ### Passwords
 
-Shared [passwordSchema](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/features/auth/auth.schema.ts) in `features/auth/` — used by Better Auth's `hooks.before`. Regex tests for uppercase, lowercase, number, and special character separately (not a single combined regex).
+No `features/auth/` directory exists. No `passwordSchema` exists. OAuth only — no password-based auth. Regex tests for uppercase, lowercase, number, and special character separately (not a single combined regex).
 
 ## 8. Comment Conventions
 
@@ -186,7 +186,7 @@ Shared [passwordSchema](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok
 - `strict: true` is on in tsconfig — write code accordingly.
 - Type declarations go in `.type.ts` files when they're reusable across service/repo/controller in the same module (e.g. `LogFilter`, `LogQueryOptions`).
 - Zod-derived types (`z.infer<>`) are preferred for anything that crosses an API boundary (request body, query params, response shape — though responses are implicit Prisma entities today).
-- `req.session` typed as `any` via global augmentation ([types/express.d.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/types/express.d.ts)). For stricter typing you could declare a `Session` interface imported from Better Auth's types.
+- `req.session` typed as `any` via global augmentation ([types/express.d.ts](src/types/express.d.ts)). For stricter typing you could declare a `Session` interface imported from Better Auth's types.
 - Express types: prefer explicit `Request` / `Response` annotations on controllers. No `any` on controllers today (except the unused `import id from "zod/v4/locales/id.cjs"` dead import in api-key controller).
 
 ## 10. Response Shape
@@ -222,8 +222,8 @@ Consistency rule: **every JSON response from a controller has `success: boolean`
 ## 11. Environment Access
 
 - Process env is read **only in `lib/*.ts` files** (singleton initialization) and in `server.ts` (for `PORT`).
-- `dotenv/config` is imported first in [server.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/server.ts#L3) so all subsequent `process.env.X` reads work.
-- OAuth env vars are validated at startup (throw if missing) in [lib/auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts#L11-L23). Follow this pattern for any env var without which the app cannot boot.
+- `dotenv/config` is imported first in [server.ts](src/server.ts#L3) so all subsequent `process.env.X` reads work.
+- OAuth env vars are validated at startup (throw if missing) in [lib/auth.ts](src/lib/auth.ts#L11-L23). Follow this pattern for any env var without which the app cannot boot.
 
 ## 12. Console Logging
 

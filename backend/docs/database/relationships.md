@@ -17,8 +17,9 @@ erDiagram
     OrganizationMember }|--|| User : "user"
     OrganizationMember }|--|| Organization : "organization"
 
-    Project ||--o{ ApiKey : "has keys (Cascade delete)"
+    Project ||--o{ ApiKey : "keys (Cascade delete)"
     Project ||--o{ LogEvent : "has logs (Cascade delete)"
+    Project ||--|| Organization : "belongs to (orgId)"
 
     ApiKey }o--|| Project : "belongs to"
     ApiKey }o--o| User : "created by"
@@ -91,6 +92,7 @@ erDiagram
     Project {
         String id PK
         String name
+        String slug UK
         String organizationId FK
         DateTime createdAt
         DateTime updatedAt
@@ -137,13 +139,13 @@ erDiagram
 ### User ↔ Organization (M:N via `OrganizationMember` join table)
 - **Join table**: `OrganizationMember` with composite PK `[organizationId, userId]`.
 - **Cardinality**: A user belongs to 0..N organizations; an organization has 1..N members (practically at least 1 OWNER to be usable).
-- **Role**: Each membership has a `role: OrganizationRole` (OWNER or MEMBER). See [authorization.md](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/docs/backend/authorization.md).
+- **Role**: Each membership has a `role: OrganizationRole` (OWNER or MEMBER). See [authorization.md](docs/backend/authorization.md).
 - **Delete rules**: Both FKs are `Cascade`. Deleting a user removes all their memberships; deleting an org removes all its members (and via other cascades, all projects, keys, logs).
 
 ### Organization ↔ Project (1:N, Cascade Delete)
 - **Cardinality**: One org has 0..N projects; a project belongs to exactly one org (project cannot be shared between orgs).
 - **Delete rule**: `onDelete: Cascade` — deleting an organization also deletes all its projects, all projects' API keys, and all projects' log events. This is the widest cascade in the system.
-- **Uniqueness**: Case-insensitive unique index `project_organizationId_lower_name_idx` on `(organizationId, lower(name))` (migration `20260819120000`). Names differing only by case are duplicates within the same org.
+- **Uniqueness**: Prisma-level `@@unique([organizationId, slug])` on Project. Case-insensitive name uniqueness via raw DB index `project_organizationId_lower_name_idx` on `(organizationId, lower(name))` (migration `20260819120000`). Names differing only by case are duplicates within the same org.
 
 ### Project ↔ ApiKey (1:N, Cascade Delete)
 - **Cardinality**: One project has 0..N API keys. A key belongs to exactly one project.

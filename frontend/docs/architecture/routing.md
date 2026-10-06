@@ -2,7 +2,7 @@
 
 ## Routes
 
-| Route | File | Type |
+|| Route | File | Type |
 |-------|------|------|
 | `/` | `app/page.tsx` | Page — marketing home wrapped in `HomeGate` |
 | `/docs` | `app/docs/page.tsx` | Page — docs index using `DocsLayout` (view: `src/views/docs/DocsPage.tsx`) |
@@ -17,8 +17,8 @@
 | `/orgs/:organizationSlug` | `app/(root)/orgs/[organizationSlug]/page.tsx` | Dynamic |
 | `/orgs/:organizationSlug/settings` | `app/(root)/orgs/[organizationSlug]/settings/page.tsx` | Dynamic |
 | `/orgs/:organizationSlug/projects` | `app/(root)/orgs/[organizationSlug]/projects/page.tsx` | Dynamic |
-| `/orgs/:organizationSlug/projects/:projectId` | `app/(root)/orgs/[organizationSlug]/projects/[projectId]/page.tsx` | Dynamic nested — log explorer |
-| `/orgs/:organizationSlug/projects/:projectId/settings` | `app/(root)/orgs/[organizationSlug]/projects/[projectId]/settings/page.tsx` | Dynamic nested — project settings |
+| `/orgs/:organizationSlug/projects/:projectSlug` | `app/(root)/orgs/[organizationSlug]/projects/[projectSlug]/page.tsx` | Dynamic nested — log explorer |
+| `/orgs/:organizationSlug/projects/:projectSlug/settings` | `app/(root)/orgs/[organizationSlug]/projects/[projectSlug]/settings/page.tsx` | Dynamic nested — project settings |
 
 Special files:
 - `app/layout.tsx` — root layout (fonts `Space_Grotesk`, `JetBrains_Mono`, `AppProvider`, `Toaster`)

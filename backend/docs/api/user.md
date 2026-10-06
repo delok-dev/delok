@@ -1,6 +1,6 @@
 # User API
 
-The user module exposes a single endpoint: `GET /api/user/me`. Routes file: [user.route.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/user/user.route.ts).
+The user module exposes a single endpoint: `GET /api/user/me`. Routes file: [user.route.ts](src/modules/user/user.route.ts).
 
 > The previous standalone user CRUD endpoints (`GET /api/user` list, `GET /api/user/search`, `GET /api/user/:id`, `POST /api/user`, `PUT /api/user/:id`, `DELETE /api/user/:id`) and their `user.service.ts` / `user.repository.ts` / `user.validation.ts` layers were removed. User creation and authentication are handled by Better Auth (`/api/auth/*`). The `user` module now only serves the authenticated session.
 
@@ -57,12 +57,12 @@ Service: No service call — controller returns `req.session` directly (unique i
 
 | Layer | File |
 |-------|------|
-| Route | [user.route.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/user/user.route.ts) |
-| Controller | [user.controller.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/user/user.controller.ts) |
+| Route | [user.route.ts](src/modules/user/user.route.ts) |
+| Controller | [user.controller.ts](src/modules/user/user.controller.ts) |
 
 ## Mounting in App
 
-From [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts#L48):
+From [app.ts](src/app.ts#L48):
 ```typescript
 app.use("/api/user", userRoute);
 ```

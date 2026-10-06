@@ -26,21 +26,21 @@ log-explorer/
 ## Functionality
 
 - **State (useLogExplorer):** `logs`, `pagination`, `page`, `limit` (default 50), `filters` (EMPTY_FILTERS), `selectedLog`, `isLoading`. `fetchSequence` guard prevents stale fetch. `filtersRef` + `realtimeLogIds` refs keep WS handler current.
-- **Fetching:** `LogService.listByProject(projectId, page, limit, filters)` on mount / when `page|limit|filters` change (deferred via `setTimeout 0`).
+- **Fetching:** `LogService.listByProject(projectSlug, page, limit, filters)` on mount / when `page|limit|filters` change (deferred via `setTimeout 0`).
 - **Filters:** `setFilter(key, value)` + `clearFilters()` reset page to 1. `hasActiveFilters` derived.
 - **Pagination:** `setPage`, `setLimit` (resets page).
-- **Realtime:** `useLogExplorerRealtime` subscribes to `projectId`, listens for `log.created`, checks `matchesLogFilters(log, filtersRef.current)`, then `onLogReceived` prepends with `isRealtime:true` and bumps `total`.
+- **Realtime:** `useLogExplorerRealtime` subscribes to `projectSlug`, listens for `log.created`, checks `matchesLogFilters(log, filtersRef.current)`, then `onLogReceived` prepends with `isRealtime:true` and bumps `total`.
 - **Detail:** `selectLog` toggles; `closeLogDetail` clears.
 
 ## Dependencies
 
 - External: none beyond `log` domain and WS
 - Internal: `src/domains/log` (`LogService`, types, utils), `src/lib/websocket/websocket.ts`, `src/lib/websocket/realtime.types.ts`
-- Other domains: `log` (required), `project` (provides `projectId`)
+- Other domains: `log` (required), `project` (provides `projectSlug`)
 
 ## Routes using it
 
-- `/orgs/:slug/projects/:projectId` -> `ProjectPage` -> `<LogExplorer organizationSlug={slug} projectId={id} />`
+- `/orgs/:slug/projects/:projectSlug` → `ProjectPage` → `<LogExplorer organizationSlug={slug} projectSlug={projectSlug} projectId={projectId} />`
 
 ## Flow
 

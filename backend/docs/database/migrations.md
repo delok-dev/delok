@@ -29,7 +29,7 @@ Raw `npx prisma ...` also works; the npm scripts are wrappers. All commands use 
 
 ## Migration Storage and Configuration
 
-### Config: [prisma.config.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma.config.ts)
+### Config: [prisma.config.ts](prisma.config.ts)
 
 ```typescript
 export default defineConfig({
@@ -41,7 +41,7 @@ export default defineConfig({
 
 Multi-schema support (Prisma 7) means: instead of one `schema.prisma`, Prisma loads all `*.prisma` files in the `prisma/schema/` folder and merges them before generation/migration.
 
-### Lockfile: [prisma/migrations/migration_lock.toml](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/migrations/migration_lock.toml)
+### Lockfile: [prisma/migrations/migration_lock.toml](prisma/migrations/migration_lock.toml)
 
 ```toml
 provider = "postgresql"
@@ -51,7 +51,7 @@ Lockfile is Prisma-managed. Committed to Git to ensure the same provider is used
 
 ### Prisma Client Output
 
-From [schema.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/schema.prisma):
+From [schema.prisma](prisma/schema/schema.prisma):
 ```prisma
 generator client {
   provider = "prisma-client"
@@ -64,7 +64,7 @@ The Prisma Client is generated into **`src/generated/prisma/`**, which is import
 import { PrismaClient } from "../generated/prisma/client";
 ```
 
-Generated files are likely gitignored (standard practice). Regenerate on new clones via `npm run db:generate`.
+Generated files are gitignored (`.gitignore:29`). Regenerate on new clones via `npm run db:generate`.
 
 ## Migration History (Inferred from Timestamps)
 
@@ -88,9 +88,11 @@ Migrations in `prisma/migrations/` are applied in timestamp order. Each is a fol
 | 14 | 20260722140759 | `harden_api_key_model` | Final ApiKey hardening — added `@@unique([keyHash])`, `keyPrefix`, `lastUsedAt DateTime?`, `createdById FK → User ON DELETE SET NULL`, and extra indexes (`projectId`, `createdById`) for the ApiKey model as it neared production use. |
 | 15 | 20260804145420 | `update_organization` | Updated the `Organization` model as a precursor to slug support (schema/constraint adjustments). |
 | 16 | 20260804160535 | `add_organization_slug` | Added `slug` column (UNIQUE) to `organization`. Derived from `name` via `generateSlug` (lowercased, spaces → hyphens, non `[a-z0-9-]` stripped). Organizations are now addressed by slug in the API (`/api/organization/:slug`). |
-| 17 | 20260819120000 | `case_insensitive_project_name` | Replaced case-sensitive `@@unique([organizationId, name])` with case-insensitive unique index `project_organizationId_lower_name_idx` on `(organizationId, lower(name))`. Migration fails if case-insensitive duplicates exist. |
+| 17 | 20260819120000 | `case_insensitive_project_name` | Replaced case-sensitive `@@unique([organizationId, name])` with case-insensitive raw index `project_organizationId_lower_name_idx` on `(organizationId, lower(name))`. A competing Prisma-level `@@unique([organizationId, slug])` was added later (migration #20). |
 | 18 | 20260821154043 | `add_created_at_updated_at_to_project` | Added `createdAt`/`updatedAt` to `project` (backfilled `CURRENT_TIMESTAMP`). |
 | 19 | 20260822191930 | `add_organization_timestamps` | Added `createdAt`/`updatedAt` to `organization` (backfilled `CURRENT_TIMESTAMP`). |
+| 20 | 20260926000000 | `add_project_slug` | Added `slug` column to `project`, backfilled from `name`, created `@@unique([organizationId, slug])` constraint, set `NOT NULL`. |
+| 21 | 20260926000001 | `fix_project_slug_backfill` | Fixed regex bug in slug generation that stripped uppercase letters from project names during backfill. |
 
 ## Development Workflow: Adding a Schema Change
 

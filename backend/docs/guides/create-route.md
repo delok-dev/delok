@@ -1,6 +1,6 @@
 # Create a New Route
 
-This guide explains how to add a new endpoint to an **existing** module. For creating a whole new module from scratch, see [create-module.md](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/docs/guides/create-module.md).
+This guide explains how to add a new endpoint to an **existing** module. For creating a whole new module from scratch, see [create-module.md](docs/guides/create-module.md).
 
 ## 1. Choose the Correct Route File
 
@@ -135,7 +135,7 @@ Use either approach, but keep the convention consistent across the project.
 
 ## 6. Mount the Router in `app.ts`
 
-If the route file is **new** (not just a new endpoint in an existing router), import and `.use()` it in [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts).
+If the route file is **new** (not just a new endpoint in an existing router), import and `.use()` it in [app.ts](src/app.ts).
 
 Ordering convention from app.ts today:
 1. CORS, JSON, request logger

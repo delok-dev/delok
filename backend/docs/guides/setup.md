@@ -21,7 +21,7 @@ The project uses:
 
 ```bash
 git clone <your-repo-url>
-cd delok-backend
+cd backend
 npm install
 ```
 
@@ -33,13 +33,13 @@ This installs:
 
 ## 2. Configure Environment Variables
 
-Create a `.env` file in the repository root. The backend loads `dotenv/config` first thing in [server.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/server.ts).
+Create a `.env` file in the repository root. The backend loads `dotenv/config` first thing in [server.ts](src/server.ts).
 
 ### Required Variables
 
 | Variable | Example | Purpose |
 |----------|---------|---------|
-| `DATABASE_URL` | `postgresql://user:pass@localhost:5432/delok?schema=public` | PostgreSQL connection string. Read by Prisma via [prisma.config.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma.config.ts) and by `lib/prisma.ts` (adapter-pg). |
+| `DATABASE_URL` | `postgresql://user:pass@localhost:5432/delok?schema=public` | PostgreSQL connection string. Read by Prisma via [prisma.config.ts](prisma.config.ts) and by `lib/prisma.ts` (adapter-pg). |
 | `PORT` | `8000` | HTTP/WebSocket port (`env.PORT`, default 8000). |
 | `BETTER_AUTH_SECRET` | `replace-with-32plus-random-string` | Session signing secret. **Throws at startup if missing.** |
 | `BETTER_AUTH_URL` | `http://localhost:8000` | Public URL of this backend (used by Better Auth `baseURL`). |
@@ -78,7 +78,7 @@ The command runs in **dev** mode: if you edit the schema later and re-run, it wi
 
 ## 4. Generate Prisma Client (if needed)
 
-The Prisma Client is output to `src/generated/prisma/` (see `output` in [schema.prisma](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/prisma/schema/schema.prisma)). You'll need this any time you change any `.prisma` file:
+The Prisma Client is output to `src/generated/prisma/` (see `output` in [schema.prisma](prisma/schema/schema.prisma)). You'll need this any time you change any `.prisma` file:
 
 ```bash
 npm run db:generate
@@ -143,7 +143,7 @@ No output = success. This checks all `.ts` files in `src/` (per tsconfig's `"inc
 ## Common Setup Issues
 
 ### Problem: `Error: Google OAuth env missing` on startup
-The `GOOGLE_CLIENT_ID` or `GOOGLE_CLIENT_SECRET` env vars are unset. Both are validated at the top of [lib/auth.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/lib/auth.ts) (along with GitHub equivalents). Fill in all four OAuth env vars.
+The `GOOGLE_CLIENT_ID` or `GOOGLE_CLIENT_SECRET` env vars are unset. Both are validated at the top of [lib/auth.ts](src/lib/auth.ts) (along with GitHub equivalents). Fill in all four OAuth env vars.
 
 ### Problem: Prisma Client not found
 Error: `Cannot find module '../generated/prisma/client'`. Solution:
@@ -152,7 +152,7 @@ npm run db:generate
 ```
 
 ### Problem: CORS errors when frontend calls backend
-CORS origin is configured via `FRONTEND_URL` env var — see [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts) `origin: [env.FRONTEND_URL]` and `.env.example` `FRONTEND_URL=http://localhost:3000`. If your frontend runs on a different port or a deployed URL, set `FRONTEND_URL` accordingly.
+CORS origin is configured via `FRONTEND_URL` env var — see [app.ts](src/app.ts) `origin: [env.FRONTEND_URL]` and `.env.example` `FRONTEND_URL=http://localhost:3000`. If your frontend runs on a different port or a deployed URL, set `FRONTEND_URL` accordingly.
 
 Allowed headers include `x-api-key` (needed for ingestion calls). If you add new custom headers, update `allowedHeaders`.
 

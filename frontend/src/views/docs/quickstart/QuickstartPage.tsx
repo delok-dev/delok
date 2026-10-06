@@ -116,7 +116,7 @@ export default function QuickstartPage() {
           code={`import { Delok } from "@delok/sdk";
 
 const delok = new Delok({
-  apiKey: process.env.DELOK_API_KEY!,
+  apiKey: process.env.DELOK_API_KEY,
   environment: "development", // "development" | "staging" | "production"
 });`}
         />
@@ -144,7 +144,7 @@ const delok = new Delok({
           <span className="font-mono text-foreground">event</span> is required.{" "}
           <span className="font-mono text-foreground">message</span> is
           optional. The method returns{" "}
-          <span className="font-mono text-foreground">void</span> and may reject
+          <span className="font-mono text-foreground">void</span> (fire-and-forget)
           on validation, network, timeout, or HTTP errors.
         </p>
       </section>
@@ -169,7 +169,7 @@ const delok = new Delok({
           structured JSON. You can filter the stored logs by the{" "}
           <span className="font-mono text-foreground">level</span>,{" "}
           <span className="font-mono text-foreground">environment</span>,{" "}
-          <span className="font-mono text-foreground">dateTime</span>, or search
+          <span className="font-mono text-foreground">occurredAt</span>, or search
           it through the{" "}
           <span className="font-mono text-foreground">message</span> or{" "}
           <span className="font-mono text-foreground">payload</span> in the

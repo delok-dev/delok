@@ -23,7 +23,7 @@ If the module has routes mounted at **multiple prefixes**, use a `routes/` subfo
 src/modules/team/routes/organization-team.route.ts   # /api/organizations/:orgId/teams
 src/modules/team/routes/team.route.ts                 # /api/team/:id
 ```
-Follow the pattern set by [project/routes/](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/project/routes) and [api-key/routes/](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/api-key/routes).
+Follow the pattern set by [project/routes/](src/modules/project/routes) and [api-key/routes/](src/modules/api-key/routes).
 
 ## Step 2: Validation (`team.validation.ts`)
 
@@ -89,7 +89,7 @@ export const deleteTeam = async (id: string) => {
 };
 ```
 
-Rules (from [dependency-rules.md](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/docs/architecture/dependency-rules.md)):
+Rules (from [dependency-rules.md](docs/architecture/dependency-rules.md)):
 - ✅ Import only from `lib/prisma.ts` + generated Prisma types
 - ❌ Do NOT throw `AppError` here (caller decides error semantics)
 - ❌ Do NOT import from services, controllers, authz, or other modules
@@ -285,7 +285,7 @@ teamRoute.delete("/:id", authMiddleware, asyncHandler(deleteTeamController));
 
 ## Step 8: Mount Routes in `app.ts`
 
-Edit [src/app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts#L48-L68) to add your new routers:
+Edit [src/app.ts](src/app.ts#L48-L68) to add your new routers:
 
 ```typescript
 import { organizationTeamRoute, teamRoute } from "./modules/team/team.route";
@@ -309,8 +309,8 @@ Keep them grouped with related modules (team next to organization / project rout
 
 | Check | Example location to compare |
 |-------|-----------------------------|
-| All 6 layers present? | Compare with [organization/](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization) module |
-| Services don't import Express types? | Compare with [organization.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.service.ts) |
-| Repos only import Prisma? | Compare with [organization.repository.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.repository.ts) |
-| Authz helpers throw AppError(403)? | Compare with [organization.authorization.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.authorization.ts) |
-| Route order: auth → validate → asyncHandler? | Compare with [organization.route.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.route.ts) |
+| All 6 layers present? | Compare with [organization/](src/modules/organization) module |
+| Services don't import Express types? | Compare with [organization.service.ts](src/modules/organization/organization.service.ts) |
+| Repos only import Prisma? | Compare with [organization.repository.ts](src/modules/organization/organization.repository.ts) |
+| Authz helpers throw AppError(403)? | Compare with [organization.authorization.ts](src/modules/organization/organization.authorization.ts) |
+| Route order: auth → validate → asyncHandler? | Compare with [organization.route.ts](src/modules/organization/organization.route.ts) |

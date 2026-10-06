@@ -130,26 +130,20 @@ export default function LoggingPage() {
           Error handling
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Logging methods may reject. Handle failures explicitly
+          The SDK sends logs fire-and-forget. Failures are swallowed internally (logged to self-monitoring); logging methods never reject.
         </p>
-        <CodeBlock
-          language="typescript"
-          code={`try {
-  delok.error({ event: "payment_failed" });
-} catch (error) {
-  if (error instanceof DelokError) {
-     // DelokConfigurationError | DelokNetworkError | DelokTimeoutError | DelokHttpError
-  }
-}`}
-        />
+        <Callout>
+          <p>
+            If you need delivery guarantees, check the self-monitoring channel (DelokError events) rather than wrapping calls in try/catch.
+        </Callout>
         <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted-foreground">
           <li>
-            Configuration errors throw synchronously from{" "}
+            Configuration errors (invalid Delok constructor args) throw synchronously from{" "}
             <span className="font-mono text-foreground">new Delok()</span>
           </li>
-          <li>Event validation rejects before the request is sent</li>
+          <li>Event validation catches invalid input before the request is sent</li>
           <li>
-            Delivery failures reject with a{" "}
+            Delivery failures are swallowed internally and logged to self-monitoring{" "}
             <span className="font-mono text-foreground">DelokError</span>
           </li>
         </ul>

@@ -5,7 +5,7 @@ Status: Accepted (inferred from current implementation)
 ## Context
 
 Delok is a log aggregation backend that needs to:
-- Authenticate users via multiple methods (email/password, Google OAuth, GitHub OAuth)
+- Authenticate users via multiple methods (Google OAuth, GitHub OAuth)
 - Manage organizations, projects, and scoped API keys
 - Accept high-volume log ingestion from external SDKs
 - Provide paginated querying of stored logs with filtering
@@ -28,13 +28,13 @@ Implement a **layered monolithic architecture** organized by both **horizontal l
 ### Vertical modules (each domain is self-contained):
 - `modules/organization/`, `modules/project/`, `modules/api-key/`, etc.
 - Each contains all layer files for that domain
-- Cross-module import limited to authorization helpers only
+- Cross-module import limited to authorization helpers and shared lib/utils (actual imports also touch lib/ and utils/ beyond authz)
 
 ### Cross-cutting folders:
 - `middlewares/` — framework middleware only
 - `utils/` — pure helpers (AppError, asyncHandler, hash)
 - `infrastructure/` — technical adapters (WebSocket)
-- `lib/` — singleton clients (Prisma, Better Auth, Resend, Delok)
+- `lib/` — singleton clients (Prisma, Better Auth, Delok SDK)
 
 ## Consequences
 

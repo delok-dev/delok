@@ -3,7 +3,7 @@
 Single endpoint for the Delok SDK to send log events to the backend.
 
 **Base URL**: `/api/ingestion`  
-**Authentication**: Via `x-api-key` request header (**not session cookies**). See [authentication.md API Key section](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/docs/backend/authentication.md#api-key-authentication-ingestion-only).
+**Authentication**: Via `x-api-key` request header (**not session cookies**). See [authentication.md API Key section](docs/backend/authentication.md#api-key-authentication-ingestion-only).
 
 Unlike other endpoints, no `authMiddleware` is mounted on this route. Authentication is handled in the controller/service.
 
@@ -109,11 +109,11 @@ realtime.emit({
 });
 ```
 
-This sends the full `createdLog` payload to all WebSocket clients subscribed to `projectId`. See [realtime.md](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/docs/backend/realtime.md).
+This sends the full `createdLog` payload to all WebSocket clients subscribed to `projectId`. See [realtime.md](docs/backend/realtime.md).
 
 ### Rate Limiting
 
-`ingestionRateLimiter` ([ingestion-rate-limit.middleware.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/middlewares/rate-limit/ingestion-rate-limit.middleware.ts)) runs **before** validation: `120 req/min` per `x-api-key` prefix (first 20 chars) or fallback per IP (`ipKeyGenerator`), window `60s`. On breach → `429 RATE_LIMIT_EXCEEDED` via `errorResponse` (`errorDetail` shape).
+`ingestionRateLimiter` ([ingestion-rate-limit.middleware.ts](src/middlewares/rate-limit/ingestion-rate-limit.middleware.ts)) runs **before** validation: `120 req/min` per `x-api-key` prefix (first 20 chars) or fallback per IP (`ipKeyGenerator`), window `60s`. On breach → `429 RATE_LIMIT_EXCEEDED` via `errorResponse` (`errorDetail` shape).
 
 ### Performance Notes
 - **`lastUsedAt` throttled update**: Only writes to `ApiKey` row if >5 minutes since last write. Prevents a DB UPDATE on every single ingestion (which would double write load for high-volume ingestors).
@@ -136,15 +136,15 @@ This sends the full `createdLog` payload to all WebSocket clients subscribed to 
 
 | Layer | File |
 |-------|------|
-| Route | [ingestion.route.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.route.ts) |
-| Controller | [ingestion.controller.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.controller.ts) |
-| Service | [ingestion.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.service.ts) |
-| Repository | [ingestion.repository.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.repository.ts) |
-| Validation | [ingestion.validation.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.validation.ts) |
+| Route | [ingestion.route.ts](src/modules/ingestion/ingestion.route.ts) |
+| Controller | [ingestion.controller.ts](src/modules/ingestion/ingestion.controller.ts) |
+| Service | [ingestion.service.ts](src/modules/ingestion/ingestion.service.ts) |
+| Repository | [ingestion.repository.ts](src/modules/ingestion/ingestion.repository.ts) |
+| Validation | [ingestion.validation.ts](src/modules/ingestion/ingestion.validation.ts) |
 
 ### Mounting in App
 
-From [app.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/app.ts#L61):
+From [app.ts](src/app.ts#L61):
 ```typescript
 app.use("/api/ingestion", ingestionRoute);
 ```

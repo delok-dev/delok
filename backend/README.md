@@ -7,7 +7,7 @@
 The backend exposes two authentication surfaces:
 
 - **Session auth (Better Auth)** for human users — Google OAuth, GitHub OAuth. Used by all management APIs (organizations, projects, API keys, log queries).
-- **API-key auth (`x-api-key: dlok_…`)** for machine ingestion — used only by `POST /api/ingestion`. Keys are `dlok_` + 32 random bytes (SHA-256 hashed at rest, `keyHash @unique`), revocable via `revokedAt`, with throttled `lastUsedAt`.
+- **API-key auth (`x-api-key: <rawKey>`)** for machine ingestion — used only by `POST /api/ingestion`. Keys are `dlok_` + 32 random bytes (SHA-256 hashed at rest, `keyHash @unique`), revocable via `revokedAt`, with throttled `lastUsedAt`.
 
 Ingested logs are normalized, stored in PostgreSQL, and broadcast over WebSocket (`log.created` + `project.log_count.updated`) to clients subscribed to that `projectId`.
 
@@ -117,7 +117,9 @@ Loaded via `dotenv/config` in `server.ts` and validated fail-fast in [`src/lib/e
 | `DATABASE_URL`                              | Yes      | PostgreSQL connection string                                    |
 | `BETTER_AUTH_SECRET`                        | Yes      | Session signing secret                                          |
 | `BETTER_AUTH_URL`                           | Yes      | Public backend URL (e.g. `http://localhost:8000`)               |
-| `FRONTEND_URL`                              | Yes      | Frontend origin for CORS `origin`, `trustedOrigins`, `errorURL` |
+| `FRONTEND_URL` | Yes | Frontend origin for CORS `origin`, `trustedOrigins`, `errorURL` |
+| `DELOK_API_KEY` | Yes | SDK self-monitoring API key (required for `lib/delok.ts`) |
+| `DELOK_SDK_BASE_URL` | No | SDK base URL (optional) |
 
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Yes      | Google OAuth                                                    |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Yes      | GitHub OAuth                                                    |
@@ -138,11 +140,11 @@ Loaded via `dotenv/config` in `server.ts` and validated fail-fast in [`src/lib/e
 | Ops             | `GET /health`, `GET /readiness`, `GET /`                           | Public                                      | `src/app.ts`                                     |
 | Realtime        | WS upgrade (session required) + `project.subscribe`                | Session + `ensureProjectMember`             | [Realtime](docs/backend/realtime.md)             |
 
-Validation via Zod (`validate` middleware for bodies); error shape `{ success:false, error:{code,message}, timestamp }` (see [Error Handling](docs/backend/error-handling.md), [Validation](docs/backend/validation.md)).
+Validation via Zod (`validate` middleware for bodies); error shapes include `error: {code, message}` (errorMiddleware), `errors: ZodIssue[]` (validate middleware), and `errorDetail: {code, message}` (rate limiter). See [Error Handling](docs/backend/error-handling.md), [Validation](docs/backend/validation.md).
 
 ## Database
 
-PostgreSQL via Prisma 7 multi-schema (`prisma/schema/`). Models: `User`, `Session`, `Account` (Better Auth); `Organization`, `OrganizationMember` (`OWNER`/`MEMBER`); `Project` (case-insensitive unique name per org via `lower(name)` index); `ApiKey` (hashed, `revokedAt` soft-delete); `LogEvent` (indexed `[projectId, occurredAt]` / `[projectId, level]`). Cascades: org → projects → keys/logs; user deletion `SetNull` on `ApiKey.createdBy`.
+PostgreSQL via Prisma 7 multi-schema (`prisma/schema/`). Models: `User`, `Session`, `Account` (Better Auth); `Organization`, `OrganizationMember` (`OWNER`/`MEMBER`); `Project` (slug-addressed, `@@unique([organizationId, slug])`, case-insensitive name index); `ApiKey` (hashed, `revokedAt` soft-delete); `LogEvent` (indexed `[projectId, occurredAt]` / `[projectId, level]`). Cascades: org → projects → keys/logs; user deletion `SetNull` on `ApiKey.createdBy`.
 
 See [Schema](docs/database/schema.md), [Relationships](docs/database/relationships.md), [Migrations](docs/database/migrations.md).
 
@@ -172,7 +174,7 @@ Framework: `vitest` (`npm test` → `vitest run`) with `supertest` and `@types/s
 | Backend      | [Authentication](docs/backend/authentication.md) · [Authorization](docs/backend/authorization.md) · [Realtime](docs/backend/realtime.md) · [Validation](docs/backend/validation.md) · [Error Handling](docs/backend/error-handling.md) |
 | Database     | [Schema](docs/database/schema.md) · [Relationships](docs/database/relationships.md) · [Migrations](docs/database/migrations.md)                                                                                                        |
 | Guides       | [Setup](docs/guides/setup.md) · [Create Module](docs/guides/create-module.md) · [Create Route](docs/guides/create-route.md) · [Coding Style](docs/guides/coding-style.md)                                                              |
-| Decisions    | [ADRs](docs/decisions/001-project-architecture.md)                                                                                                                                                                                     |
+| Decisions    | [ADR 001](docs/decisions/001-project-architecture.md) · [ADR 002](docs/decisions/002-service-layer.md) · [ADR 003](docs/decisions/003-repository-pattern.md) · [ADR 004](docs/decisions/004-prisma.md) · [ADR 005](docs/decisions/005-validation.md) |
 
 ## License
 

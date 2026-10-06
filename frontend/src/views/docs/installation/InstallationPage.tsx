@@ -39,7 +39,7 @@ export default function InstallationPage() {
         </p>
         <CodeBlock language="bash" code={`npm install @delok/sdk`} />
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Delok requires Node.js 18 or later.
+          Delok requires Node.js 22 or later.
         </p>
       </section>
 
@@ -51,10 +51,10 @@ export default function InstallationPage() {
           language="typescript"
           code={`import { Delok } from "@delok/sdk";
 
-const delok = new Delok({
-  apiKey: "your_api_key",
-  environment: "development",
-});`}
+          const delok = new Delok({
+            apiKey: "your_api_key",
+            environment: "development",
+          });`}
         />
         <p className="text-sm leading-relaxed text-muted-foreground">
           If <span className="font-mono text-foreground">apiKey</span> or{" "}

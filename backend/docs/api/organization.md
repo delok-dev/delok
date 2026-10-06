@@ -1,6 +1,6 @@
 # Organization API
 
-All endpoints under `/api/organization` (plus nested project endpoints documented in [project.md](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/docs/api/project.md)). Every endpoint requires a valid session via `authMiddleware`.
+All endpoints under `/api/organization` (plus nested project endpoints documented in [project.md](docs/api/project.md)). Every endpoint requires a valid session via `authMiddleware`.
 
 **Base URL**: `/api/organization`  
 **Authentication**: Required (Better Auth session)  
@@ -43,8 +43,8 @@ Each item is the raw Prisma Organization entity (only fields defined on the mode
 
 ### Service + Repository
 
-- Service: [organization.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.service.ts#L30-L33) → `getAllOrganizationService(userId)`
-- Repository: [organization.repository.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.repository.ts#L27-L37) → `findAllOrganizations(userId)`: `findMany WHERE organizationMembers some { userId }`
+- Service: [organization.service.ts](src/modules/organization/organization.service.ts#L30-L33) → `getAllOrganizationService(userId)`
+- Repository: [organization.repository.ts](src/modules/organization/organization.repository.ts#L27-L37) → `findAllOrganizations(userId)`: `findMany WHERE organizationMembers some { userId }`
 
 ### Error Responses
 
@@ -98,8 +98,8 @@ The service derives the URL slug on creation via `generateSlug(name)` (lowercase
 
 ### Service + Repository
 
-- Service: [organization.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.service.ts#L18-L23) → `createOrganizationService(name, userId)`
-- Repository: [organization.repository.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.repository.ts#L9-L21) → `createOrganization(name, slug, userId)` creates org + nested OWNER membership in one transaction
+- Service: [organization.service.ts](src/modules/organization/organization.service.ts#L18-L23) → `createOrganizationService(name, userId)`
+- Repository: [organization.repository.ts](src/modules/organization/organization.repository.ts#L9-L21) → `createOrganization(name, slug, userId)` creates org + nested OWNER membership in one transaction
 
 ### Error Responses
 
@@ -124,7 +124,7 @@ Return a single organization if the user is a member.
 
 ### Authorization
 
-Calls `ensureOrganizationMember(slug, userId)` — see [organization.authorization.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.authorization.ts#L13-L35).
+Calls `ensureOrganizationMember(slug, userId)` — see [organization.authorization.ts](src/modules/organization/organization.authorization.ts#L13-L35).
 
 ### Response: `200 OK`
 
@@ -247,7 +247,7 @@ Prisma's `delete()` returns the deleted row, so `data` contains the final state 
 
 ## Route File Location
 
-[organization.route.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.route.ts)
+[organization.route.ts](src/modules/organization/organization.route.ts)
 
 All routes use the pattern:
 `authMiddleware → validate(schema, if any) → asyncHandler(controller)`

@@ -33,15 +33,15 @@ sequenceDiagram
         WS-->>Client: WebSocket Connection
         Note over WS,WS2: Separate WebSocket flow below
     else Regular HTTP
-        HTTP->>CORS: Preflight / Origin check
-        CORS->>JSON: Parse JSON body
-        JSON->>Log: Log [METHOD] URL + body
-        Log->>Rl: Route matched auth path?
-        alt Auth endpoint
-            Rl->>R: Apply rate limits per path
-        else Other endpoint
-            Rl->>R: Skip (no rate limit)
-        end
+        HTTP->>H: helmet() security headers
+                H->>L: Request ID + structured logger
+                L->>CORS: Origin check
+                CORS->>ARL: Route matched /api/auth?
+                alt Auth endpoint
+                    ARL->>BAuth: toNodeHandler(auth)
+                else Other endpoint
+                    ARL->>JSON: express.json({limit:"1mb"})
+                    JSON->>R: Route matching
         R->>AM: Route has authMiddleware?
         alt Protected route
             AM->>AM: Verify session via Better Auth
@@ -92,8 +92,8 @@ sequenceDiagram
     end
 
     Note over EM,SDK: Error Path
-    EM->>SDK: errorLogger(error, errorCode, req) → delok.error(...)
-    EM-->>Client: status { success: false, error: { code, message }, timestamp }
+        EM->>SDK: delok.error(event, { error, message, method, path, stack })
+        EM-->>Client: status { success: false, error: { code, message }, timestamp }
 ```
 
 ## Two Authentication Flows
@@ -106,7 +106,7 @@ Used by all routes mounted under `/api/organization/*`, `/api/organizations/:org
 
 **Step-by-step:**
 1. Client sends HTTP request with Better Auth cookies (from browser)
-2. `authMiddleware` calls `auth.api.getSession({ headers: fromNodeHeaders(req.headers) })` — see [auth.middleware.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/middlewares/auth.middleware.ts#L8-L27)
+2. `authMiddleware` calls `auth.api.getSession({ headers: fromNodeHeaders(req.headers) })` — see `auth.middleware.ts`
 3. Better Auth resolves the session cookie → looks up `Session` table → joins `User`
 4. If session exists: `req.session = { user, ...session }` → proceed
 5. If no session: throw `AppError("unauthorized", 401)` → caught by error middleware
@@ -116,11 +116,11 @@ Used by all routes mounted under `/api/organization/*`, `/api/organizations/:org
 Used exclusively by `POST /api/ingestion`.
 
 **Step-by-step:**
-1. Client (Delok SDK) sends request with `x-api-key: dlok_<raw_key>` header
+1. Client (Delok SDK) sends request with `x-api-key: <rawKey>` header
 2. No `authMiddleware` — ingestion route is **public** on the middleware level
-3. Controller reads `req.get("x-api-key")` — see [ingestion.controller.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.controller.ts#L12-L33)
+3. Controller reads `req.get("x-api-key")` — see `ingestion.controller.ts`
 4. Calls `createLogEventService(apiKey, ...)`
-5. Service hashes the raw key with `sha256(rawKey)` → looks up `ApiKey` by `keyHash` — see [ingestion.service.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/ingestion/ingestion.service.ts#L19-L65)
+5. Service hashes the raw key with `sha256(rawKey)` → looks up `ApiKey` by `keyHash` — see `ingestion.service.ts`
 6. Checks: key exists AND `revokedAt` is null → continue
 7. Updates `lastUsedAt` if more than 5 minutes elapsed
 8. Uses the key's linked `projectId` to create the log
@@ -133,7 +133,6 @@ Used exclusively by `POST /api/ingestion`.
 |----------|-------|------|-------------------|
 | `validate(schema)` middleware | Request body **before** controller | Zod `safeParse` | Direct 400 response with Zod issues (does NOT go through error middleware) |
 | Controller (query params) | `req.query` for GET endpoints | Zod `parse` inside controller | Throws → caught by `asyncHandler` → error middleware → 500 (Zod error) |
-| Better Auth hook | Sign-up password | Zod schema in `hooks.before` | `APIError("BAD_REQUEST")` → Better Auth error handling |
 | Service layer | Business rules (name length ≥3, key not revoked, etc.) | Manual checks + `AppError` | `throw AppError` → error middleware → formatted JSON |
 
 **Note:** The log-event controller calls `logEventQuerySchema.parse(req.query)` (not `safeParse`), so Zod errors on query params propagate through the error middleware path rather than returning the raw Zod issues array.
@@ -142,14 +141,14 @@ Used exclusively by `POST /api/ingestion`.
 
 Authorization is **not middleware** — it's invoked explicitly inside service functions via `ensure*()` helpers.
 
-Example flow for `DELETE /api/organizations/:organizationSlug/projects/:projectId`:
-1. Controller → `deleteProjectService(organizationSlug, projectId, userId)`
-2. Service → `ensureOrganizationOwner(organizationSlug, userId)` — see [organization.authorization.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/organization/organization.authorization.ts#L43-L58)
+Example flow for `DELETE /api/organizations/:organizationSlug/projects/:projectSlug`:
+1. Controller → `deleteProjectService(organizationSlug, projectSlug, userId)`
+2. Service → `ensureOrganizationOwner(slug, userId)` — see `organization.authorization.ts`
 3. Helper → `findOwnerMembership(slug, userId)` (repo)
-4. Service → `ensureProjectInOrganization(projectId, member.organizationId)` — see [project.authorization.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/modules/project/project.authorization.ts#L42-L53)
-5. Helper → `findProjectByIdAndOrganization(projectId, organizationId)` (repo) — 404 if the project does not belong to that organization
+4. Service → `ensureProjectInOrganization(projectSlug, member.organizationId)` — see `project.authorization.ts`
+5. Helper → `findProjectBySlugAndOrganization(projectSlug, organizationId)` (repo) — 404 if the project does not belong to that organization
 6. If owner + project in org: proceeds to `deleteProject(projectId)`
-7. If not owner: logs with `delok.warn()` → throws `AppError("Forbidden", 403)`
+7. If not owner: logs with `console.warn(JSON.stringify(...))` → throws `AppError("Forbidden", 403)`
 
 This design means authorization is **co-located with business logic**: every service call makes its own authz decision. There is no declarative `@Roles(OWNER)` annotation pattern.
 
@@ -157,12 +156,12 @@ This design means authorization is **co-located with business logic**: every ser
 
 Errors are caught at two levels:
 
-1. **`asyncHandler` wrapper** — wraps every async controller. Any `throw` or rejected promise inside `controller → service → repo` chain is forwarded to Express's `next(error)`. See [async-handler.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/utils/async-handler.ts#L3-L7).
+1. **`asyncHandler` wrapper** — wraps every async controller. Any `throw` or rejected promise inside `controller → service → repo` chain is forwarded to Express's `next(error)`. See `async-handler.ts`.
 
-2. **`errorMiddleware`** — mounted as the last app-level middleware. See [error.middleware.ts](file:///c:/Users/Yuan/OneDrive/Desktop/Codes/Delok/delok-backend/src/middlewares/error.middleware.ts#L31-L51):
+2. **`errorMiddleware`** — mounted as the last app-level middleware. See `error.middleware.ts`:
    - If error is `AppError`: use its `statusCode`, `errorCode`, `message`
    - If generic `Error`: 500 + "Internal Server Error"
-   - Logs via `errorLogger(error, errorCode, req)` which calls `delok.error()` (self-monitoring)
+   - Logs via `delok.error()` (self-monitoring) + `console.error` for 5xx
    - Returns JSON: `{ success: false, error: { code, message }, timestamp }`
 
 **Exception:** The validation middleware returns errors directly (not via error middleware) to preserve Zod's structured `issues` array format.
