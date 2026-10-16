@@ -11,6 +11,7 @@ Internal technical documentation for developers maintaining and extending the De
 | Backend | `docs/backend/` | Authentication, authorization, realtime, validation, error handling |
 | Database | `docs/database/` | Schema, relationships, migrations |
 | Guides | `docs/guides/` | Setup, conventions, creating modules and routes |
+| Integrations | `docs/integrations/` | MCP stdio server, tools, and client registration |
 | Decisions | `docs/decisions/` | Technical decisions and rationale (ADRs) |
 
 ## Index
@@ -46,6 +47,9 @@ Internal technical documentation for developers maintaining and extending the De
 - [Create a Module](guides/create-module.md)
 - [Create a Route](guides/create-route.md)
 - [Coding Style](guides/coding-style.md)
+
+### Integrations
+- [MCP (local stdio server)](integrations/mcp.md)
 
 ### Decisions
 - [001 — Project Architecture](decisions/001-project-architecture.md)
